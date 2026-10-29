@@ -1,0 +1,8 @@
+target-version = "py313"
+line-length = 120
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "BLE", "RUF"]
+# E741: the Easter computation keeps Meeus's variable names (l, m) so it can be checked against the book.
+# RUF005: list concatenation is left as the blind author wrote it; style changes would muddy its history.
+ignore = ["E741", "RUF005"]

@@ -1,0 +1,23 @@
+{{- if .Values.ingress.enabled }}
+# One host: /v1, /healthz and /readyz go to the API, everything else to the console. /metrics stays inside the cluster.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "ce.name" . }}
+  labels: {{- include "ce.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls }}
+  tls: [{ hosts: [{{ .Values.ingress.host | quote }}] }]
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - { path: /v1, pathType: Prefix, backend: { service: { name: {{ include "ce.name" . }}-api, port: { name: http } } } }
+          - { path: /readyz, pathType: Exact, backend: { service: { name: {{ include "ce.name" . }}-api, port: { name: http } } } }
+          - { path: /, pathType: Prefix, backend: { service: { name: {{ include "ce.name" . }}-console, port: { name: http } } } }
+{{- end }}

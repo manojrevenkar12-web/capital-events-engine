@@ -23,7 +23,7 @@ const w = await buildWorld(app, "Spreeblick Capital", {
   seed: arg("seed", 2026),
 });
 const tok = (sub: string, roles: Array<"preparer" | "approver" | "viewer" | "admin">) =>
-  issueToken(config.JWT_SECRET, config.JWT_ISSUER, { sub, tid: w.tenantId, roles }, "30d");
+  issueToken(config.JWT_SECRET ?? "", config.JWT_ISSUER, { sub, tid: w.tenantId, roles }, "30d");
 console.log(
   JSON.stringify(
     {

@@ -1,0 +1,40 @@
+{{- if .Values.networkPolicy.enabled }}
+# The API takes traffic from the ingress controller and Prometheus, and talks to MySQL, DNS and
+# HTTPS (identity provider keys, and the model API when EXTRACTOR=claude). Nothing else.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "ce.name" . }}-api
+  labels: {{- include "ce.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels: {{- include "ce.selector" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressNamespace }} } }
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } }
+      ports: [{ port: 3000 }]
+  egress:
+    - to: [{ ipBlock: { cidr: {{ .Values.networkPolicy.databaseCidr }} } }]
+      ports: [{ port: 3306 }]
+    - to: [{ namespaceSelector: {}, podSelector: { matchLabels: { k8s-app: kube-dns } } }]
+      ports: [{ port: 53, protocol: UDP }, { port: 53, protocol: TCP }]
+    - ports: [{ port: 443 }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "ce.name" . }}-console
+  labels: {{- include "ce.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels: {{- include "ce.selector" . | nindent 6 }}
+      app.kubernetes.io/component: console
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from: [{ namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressNamespace }} } } }]
+      ports: [{ port: 8080 }]
+  egress: []
+{{- end }}

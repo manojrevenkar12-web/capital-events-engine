@@ -1,0 +1,22 @@
+# CI smoke test on kind: images loaded from the runner, an in-cluster MySQL, dev tokens on.
+image:
+  pullPolicy: Never
+api:
+  replicas: 1
+  autoscaling: { enabled: false }
+  env:
+    LOG_LEVEL: info
+    REQUIRED_APPROVALS: "1"
+    EXTRACTOR: rules
+    OUTBOX_POLL_MS: "500"
+    JWT_ISSUER: https://id.cee.local
+    JWKS_URL: null
+    DEV_TOKENS: "on"
+console:
+  replicas: 1
+secrets:
+  name: capital-events
+  externalSecret: { enabled: false }
+ingress: { enabled: false }
+networkPolicy: { enabled: false }
+podDisruptionBudget: { minAvailable: 0 }

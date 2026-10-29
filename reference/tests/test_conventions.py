@@ -8,11 +8,15 @@ from conftest import err, ok
 
 from cee_ref.allocation import allocate
 from cee_ref.dates import (
-    add_business_days, add_years, days, easter_sunday, is_business_day, subtract_business_days,
+    add_business_days,
+    add_years,
+    days,
+    easter_sunday,
+    is_business_day,
+    subtract_business_days,
 )
 from cee_ref.errors import CalcError
 from cee_ref.money import round_half_even
-
 
 # ---- 1.2 rounding ---------------------------------------------------------------
 

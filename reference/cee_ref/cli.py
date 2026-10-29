@@ -73,7 +73,7 @@ def run_text(text: str) -> dict:
         return {"ok": False, "error": "INVALID_INPUT"}
     try:
         return run_scenario(scenario)
-    except Exception as exc:  # a defect in this implementation, never a silent match
+    except Exception as exc:  # noqa: BLE001 - a defect here becomes INTERNAL_ERROR, which never matches the engine
         return {"ok": False, "error": "INTERNAL_ERROR", "message": f"{type(exc).__name__}: {exc}"}
 
 

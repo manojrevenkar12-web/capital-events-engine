@@ -45,7 +45,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     @Inject(CONFIG) private readonly config: AppConfig,
   ) {
-    this.secret = new TextEncoder().encode(config.JWT_SECRET);
+    this.secret = new TextEncoder().encode(config.JWT_SECRET ?? "");
     if (config.JWKS_URL) this.jwks = createRemoteJWKSet(new URL(config.JWKS_URL));
   }
 
@@ -57,8 +57,13 @@ export class AuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException("missing bearer token");
     let payload: unknown;
     try {
+      // algorithms are pinned per key source, so an HS256 token can never pass as an identity-provider token
       const opts = { issuer: this.config.JWT_ISSUER, audience: "cee-api" };
-      payload = (this.jwks ? await jwtVerify(token, this.jwks, opts) : await jwtVerify(token, this.secret, opts)).payload;
+      payload = (
+        this.jwks
+          ? await jwtVerify(token, this.jwks, { ...opts, algorithms: ["RS256", "ES256", "PS256"] })
+          : await jwtVerify(token, this.secret, { ...opts, algorithms: ["HS256"] })
+      ).payload;
     } catch {
       throw new UnauthorizedException("invalid token");
     }

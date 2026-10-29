@@ -1,0 +1,67 @@
+# Images are built by CI and pushed to ECR with immutable tags (the git sha).
+image:
+  api: { repository: ghcr.io/manojrevenkar12-web/capital-events-api, tag: "" }
+  console: { repository: ghcr.io/manojrevenkar12-web/capital-events-console, tag: "" }
+  pullPolicy: IfNotPresent
+
+api:
+  replicas: 3
+  resources:
+    requests: { cpu: 250m, memory: 384Mi }
+    limits: { memory: 768Mi }
+  autoscaling: { enabled: true, minReplicas: 3, maxReplicas: 12, targetCPU: 65 }
+  env:
+    LOG_LEVEL: info
+    REQUIRED_APPROVALS: "1"
+    # rules runs in-cluster; "claude" sends letters to the model (needs anthropicKey below)
+    EXTRACTOR: rules
+    OUTBOX_POLL_MS: "1000"
+    JWT_ISSUER: https://login.example.com/
+    JWKS_URL: https://login.example.com/.well-known/jwks.json
+    DEV_TOKENS: "off"
+
+console:
+  replicas: 2
+  resources:
+    requests: { cpu: 50m, memory: 32Mi }
+    limits: { memory: 128Mi }
+
+# Secrets are synced from AWS Secrets Manager by External Secrets; the chart only references them.
+secrets:
+  # keys: DATABASE_URL, JWT_SECRET (dev only), ANTHROPIC_API_KEY (optional)
+  name: capital-events
+  externalSecret:
+    enabled: true
+    store: aws-secrets-manager
+    remoteKey: capital-events/prod
+
+migrations:
+  enabled: true
+  backoffLimit: 1
+
+ingress:
+  enabled: true
+  className: alb
+  host: capital-events.example.com
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+  tls: true
+
+serviceAccount:
+  # IRSA / Pod Identity role allowed to read the secret and nothing else
+  annotations: {}
+
+networkPolicy:
+  enabled: true
+  # the database's CIDR (RDS subnets) and the ingress controller's namespace
+  databaseCidr: 10.0.0.0/16
+  ingressNamespace: kube-system
+
+podDisruptionBudget:
+  minAvailable: 2
+
+serviceMonitor:
+  enabled: false

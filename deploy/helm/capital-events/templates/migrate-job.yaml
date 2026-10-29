@@ -1,0 +1,32 @@
+{{- if .Values.migrations.enabled }}
+# Runs before every install and upgrade; the new API version starts only if its migrations applied.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ce.name" . }}-migrate-{{ .Release.Revision }}
+  labels: {{- include "ce.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: {{ .Values.migrations.backoffLimit }}
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels: {{- include "ce.selector" . | nindent 8 }}
+        app.kubernetes.io/component: migrate
+    spec:
+      restartPolicy: Never
+      # hooks run before the chart's own resources exist, so the job uses no chart service account
+      automountServiceAccountToken: false
+      securityContext: {{- include "ce.podSecurity" . | nindent 8 }}
+      containers:
+        - name: migrate
+          image: {{ include "ce.image" (dict "root" . "which" "api") }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["dist/db/migrate-cli.js"]
+          env: {{- include "ce.apiEnv" . | nindent 12 }}
+          securityContext: {{- include "ce.containerSecurity" . | nindent 12 }}
+          resources: { requests: { cpu: 100m, memory: 128Mi }, limits: { memory: 256Mi } }
+{{- end }}

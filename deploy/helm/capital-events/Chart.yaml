@@ -1,0 +1,7 @@
+apiVersion: v2
+name: capital-events
+description: Capital events API, outbox worker and operations console on Kubernetes
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+kubeVersion: ">=1.30.0-0"

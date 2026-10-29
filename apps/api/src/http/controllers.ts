@@ -17,6 +17,7 @@ import { AddCommitment, CreateFund, CreateInvestor, FundsService } from "../fund
 import { LedgerService } from "../ledger/ledger.service.js";
 import { PaymentsService, Resolve } from "../payments/payments.service.js";
 import { Decision, Election, SideLettersService, UploadSideLetter } from "../side-letters/side-letters.service.js";
+import { Accepts, AcceptsXml } from "./contract.js";
 import { IdempotencyInterceptor } from "./idempotency.interceptor.js";
 import { bankEntries, eventsIssued, registry } from "./metrics.js";
 import { toWire } from "./serialize.js";
@@ -52,7 +53,7 @@ export class HealthController {
   }
 }
 
-const TokenRequest = z.object({
+export const TokenRequest = z.object({
   sub: z.string().min(1),
   name: z.string().optional(),
   tenantId: z.string(),
@@ -78,11 +79,12 @@ export class DevController {
   /** The local identity provider; off unless DEV_TOKENS=on. Production verifies RS256 from JWKS_URL. */
   @Public()
   @Post("token")
+  @Accepts(TokenRequest)
   async token(@Body() body: unknown) {
     if (!this.config.DEV_TOKENS) throw notFound("route", "/v1/dev/token");
     const r = parse(TokenRequest, body);
     return {
-      token: await issueToken(this.config.JWT_SECRET, this.config.JWT_ISSUER, {
+      token: await issueToken(this.config.JWT_SECRET ?? "", this.config.JWT_ISSUER, {
         sub: r.sub,
         ...(r.name ? { name: r.name } : {}),
         tid: r.tenantId,
@@ -109,6 +111,7 @@ export class FundsController {
 
   @Roles("preparer")
   @Post("funds")
+  @Accepts(CreateFund)
   async create(@CurrentUser() p: Principal, @Body() body: unknown) {
     return toWire(await this.funds.createFund(p, parse(CreateFund, body)));
   }
@@ -121,6 +124,7 @@ export class FundsController {
 
   @Roles("preparer")
   @Post("funds/:fundId/commitments")
+  @Accepts(AddCommitment)
   async commit(@CurrentUser() p: Principal, @Param("fundId") id: string, @Body() body: unknown) {
     return toWire(await this.funds.addCommitment(p, id, parse(AddCommitment, body)));
   }
@@ -146,6 +150,7 @@ export class FundsController {
 
   @Roles("preparer")
   @Post("investors")
+  @Accepts(CreateInvestor)
   async createInvestor(@CurrentUser() p: Principal, @Body() body: unknown) {
     return toWire(await this.funds.createInvestor(p, parse(CreateInvestor, body)));
   }
@@ -158,6 +163,7 @@ export class SideLettersController {
 
   @Roles("preparer")
   @Post("funds/:fundId/side-letters")
+  @Accepts(UploadSideLetter)
   async upload(@CurrentUser() p: Principal, @Param("fundId") id: string, @Body() body: unknown) {
     return toWire(await this.letters.upload(p, id, parse(UploadSideLetter, body)));
   }
@@ -186,6 +192,7 @@ export class SideLettersController {
 
   @Roles("approver")
   @Post("provisions/:id/decision")
+  @Accepts(Decision)
   async decide(@CurrentUser() p: Principal, @Param("id") id: string, @Body() body: unknown) {
     return toWire(await this.letters.decide(p, id, parse(Decision, body)));
   }
@@ -205,12 +212,14 @@ export class SideLettersController {
 
   @Roles("preparer", "investor")
   @Post("funds/:fundId/mfn/:investorId/election")
+  @Accepts(Election)
   async elect(@CurrentUser() p: Principal, @Param("fundId") id: string, @Param("investorId") inv: string, @Body() body: unknown) {
     return toWire(await this.letters.elect(p, id, inv, parse(Election, body)));
   }
 }
 
-const ApproveBody = z.object({ resultHash: z.string().length(64) });
+export const ApproveBody = z.object({ resultHash: z.string().length(64) });
+export const FeederCallBody = z.object({ feederFundId: z.string(), issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) });
 
 @Controller("v1")
 @UseInterceptors(IdempotencyInterceptor)
@@ -228,18 +237,21 @@ export class EventsController {
 
   @Roles("preparer")
   @Post("funds/:fundId/calls")
+  @Accepts(CreateCall)
   async call(@CurrentUser() p: Principal, @Param("fundId") id: string, @Body() body: unknown) {
     return toWire(await this.events.createCall(p, id, parse(CreateCall, body)));
   }
 
   @Roles("preparer")
   @Post("funds/:fundId/distributions")
+  @Accepts(CreateDistribution)
   async distribution(@CurrentUser() p: Principal, @Param("fundId") id: string, @Body() body: unknown) {
     return toWire(await this.events.createDistribution(p, id, parse(CreateDistribution, body)));
   }
 
   @Roles("preparer")
   @Post("funds/:fundId/closings")
+  @Accepts(CreateClosing)
   async closing(@CurrentUser() p: Principal, @Param("fundId") id: string, @Body() body: unknown) {
     return toWire(await this.events.createClosing(p, id, parse(CreateClosing, body)));
   }
@@ -264,6 +276,7 @@ export class EventsController {
 
   @Roles("approver")
   @Post("events/:id/approve")
+  @Accepts(ApproveBody)
   async approve(@CurrentUser() p: Principal, @Param("id") id: string, @Body() body: unknown) {
     return toWire(await this.events.approve(p, id, parse(ApproveBody, body).resultHash));
   }
@@ -290,8 +303,9 @@ export class EventsController {
 
   @Roles("preparer")
   @Post("events/:id/feeder-calls")
+  @Accepts(FeederCallBody)
   async feederCall(@CurrentUser() p: Principal, @Param("id") id: string, @Body() body: unknown) {
-    const b = parse(z.object({ feederFundId: z.string(), issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }), body);
+    const b = parse(FeederCallBody, body);
     return toWire(await this.events.createFeederCall(p, id, b.feederFundId, b.issueDate));
   }
 
@@ -309,6 +323,7 @@ export class PaymentsController {
 
   @Roles("preparer")
   @Post("funds/:fundId/bank/camt054")
+  @AcceptsXml()
   async camt(@CurrentUser() p: Principal, @Param("fundId") id: string, @Body() body: unknown) {
     if (typeof body !== "string") throw new DomainError(415, "XML_REQUIRED", "send the camt.054 as application/xml");
     const r = await this.payments.importCamt054(p, id, body);
@@ -330,6 +345,7 @@ export class PaymentsController {
 
   @Roles("preparer")
   @Post("funds/:fundId/bank/entries/:entryId/resolve")
+  @Accepts(Resolve)
   async resolve(@CurrentUser() p: Principal, @Param("fundId") id: string, @Param("entryId") entry: string, @Body() body: unknown) {
     return toWire(await this.payments.resolve(p, id, entry, parse(Resolve, body)));
   }

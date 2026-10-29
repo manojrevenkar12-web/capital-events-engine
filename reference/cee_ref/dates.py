@@ -1,7 +1,7 @@
 """Section 1.3 / 1.4 / 4.3: day counts, TARGET2 business days, add_years."""
 
 from datetime import date, timedelta
-from functools import lru_cache
+from functools import cache
 
 ONE_DAY = timedelta(days=1)
 
@@ -30,7 +30,7 @@ def easter_sunday(year: int) -> date:
     return date(year, month, day)
 
 
-@lru_cache(maxsize=None)
+@cache
 def holidays(year: int) -> frozenset:
     easter = easter_sunday(year)
     return frozenset(

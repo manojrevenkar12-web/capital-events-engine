@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from cee_ref.cli import run_scenario  # noqa: E402
+from cee_ref.cli import run_scenario
 
 
 def run(op, inp):

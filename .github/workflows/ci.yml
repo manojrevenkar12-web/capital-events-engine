@@ -1,0 +1,185 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+concurrency: { group: "ci-${{ github.ref }}", cancel-in-progress: true }
+
+env:
+  NODE_VERSION: "22"
+  MYSQL_URL: mysql://root:root@127.0.0.1:3306/cee
+
+jobs:
+  checks:
+    name: lint, types, engine and console tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: scripts/ci-run.sh "biome" pnpm exec biome ci .
+      - run: scripts/ci-run.sh "engine build" pnpm --filter @cee/engine build
+      - run: scripts/ci-run.sh "typecheck" pnpm -r typecheck
+      - run: scripts/ci-run.sh "engine tests" pnpm --filter @cee/engine test
+      - run: scripts/ci-run.sh "console tests" pnpm --filter @cee/console test
+      - run: scripts/ci-run.sh "console build" pnpm --filter @cee/console build
+
+  differential:
+    name: engine against the blind Python reference
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - run: pip install pytest==8.4.2 ruff==0.14.3
+      - run: scripts/ci-run.sh "ruff" ruff check reference
+      - run: cd reference && ../scripts/ci-run.sh "reference tests" python -m pytest -q
+      - run: pnpm install --frozen-lockfile
+      - name: 30,000 generated scenarios, both implementations, results must be identical
+        run: |
+          mkdir -p build
+          scripts/ci-run.sh "differential generate" pnpm exec tsx tools/differential/generate.ts 30000 ${{ github.run_number }} build/scenarios.jsonl
+          scripts/ci-run.sh "differential compare" pnpm exec tsx tools/differential/compare.ts build/scenarios.jsonl build/differential.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: differential, path: build/differential.json, if-no-files-found: ignore }
+
+  api:
+    name: API on MySQL 8.4 (server in CET)
+    runs-on: ubuntu-24.04
+    services:
+      mysql:
+        image: mysql:8.4
+        env: { MYSQL_ROOT_PASSWORD: root, MYSQL_DATABASE: cee, TZ: Europe/Berlin }
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -proot" --health-interval 5s --health-timeout 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @cee/engine build
+      - run: scripts/ci-run.sh "api build" pnpm --filter @cee/api build
+      - run: scripts/ci-run.sh "api tests" pnpm --filter @cee/api test
+        env: { CEE_TEST_DATABASE_URL: "${{ env.MYSQL_URL }}" }
+      - name: held-out side letters (the first run is pinned and must not change)
+        run: |
+          scripts/ci-run.sh "held-out" pnpm --filter @cee/api heldout
+          scripts/ci-run.sh "held-out first run rewritten" git diff --exit-code -- 'reports/heldout/*/first_run.json'
+
+  e2e:
+    name: console end to end (four-eyes flow, CSP, phone)
+    runs-on: ubuntu-24.04
+    services:
+      mysql:
+        image: mysql:8.4
+        env: { MYSQL_ROOT_PASSWORD: root, MYSQL_DATABASE: cee }
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -proot" --health-interval 5s --health-timeout 3s --health-retries 30
+    env:
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/cee
+      JWT_SECRET: ci-only-secret-at-least-32-characters-long
+      DEV_TOKENS: "on"
+      LOG_LEVEL: warn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @cee/engine build && pnpm --filter @cee/api build && pnpm --filter @cee/console build
+      - run: scripts/ci-run.sh "seed" pnpm --filter @cee/api seed
+      - name: start the API and the console
+        run: |
+          (cd apps/api && nohup node dist/main.js > ../../build-api.log 2>&1 &)
+          (cd apps/console && nohup pnpm exec vite preview --port 4173 --strictPort > ../../build-console.log 2>&1 &)
+          for i in $(seq 1 60); do curl -sf 127.0.0.1:3000/readyz && curl -sf 127.0.0.1:4173 > /dev/null && exit 0; sleep 1; done
+          tail -n 30 build-api.log; exit 1
+      - run: pnpm --filter @cee/console exec playwright install --with-deps chromium
+      - run: scripts/ci-run.sh "e2e" pnpm --filter @cee/console e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: e2e-report, path: "build/e2e-report\napps/console/test-results\nbuild-api.log" }
+
+  deploy-config:
+    name: Helm and Terraform
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with: { version: v3.19.0 }
+      - name: helm lint and render, validated against Kubernetes 1.33 schemas
+        run: |
+          set -euo pipefail
+          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-linux-amd64.tar.gz | tar xz kubeconform
+          helm lint deploy/helm/capital-events --set image.api.tag=ci --set image.console.tag=ci
+          helm template ce deploy/helm/capital-events --set image.api.tag=ci --set image.console.tag=ci > build-prod.yaml
+          helm template ce deploy/helm/capital-events -f deploy/kind/values-kind.yaml --set image.api.tag=ci --set image.console.tag=ci > build-kind.yaml
+          ./kubeconform -strict -summary -kubernetes-version 1.33.0 -ignore-missing-schemas build-prod.yaml build-kind.yaml
+          if helm template ce deploy/helm/capital-events > /dev/null 2>&1; then echo "::error title=helm::a release without an image tag must fail"; exit 1; fi
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: 1.13.4 }
+      - name: terraform fmt and validate
+        working-directory: deploy/terraform
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          ../../scripts/ci-run.sh "terraform validate" terraform validate
+
+  kind:
+    name: images on a kind cluster (migrate, roll out, seed, call the API)
+    needs: [checks, api]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: build images
+        run: |
+          docker build -f apps/api/Dockerfile -t ce-api:ci .
+          docker build -f apps/console/Dockerfile -t ce-console:ci .
+      - uses: helm/kind-action@v1
+        with: { cluster_name: ce, version: v0.30.0 }
+      - uses: azure/setup-helm@v4
+        with: { version: v3.19.0 }
+      - name: install
+        run: |
+          set -euo pipefail
+          kind load docker-image ce-api:ci ce-console:ci --name ce
+          kubectl apply -f deploy/kind/mysql.yaml
+          kubectl rollout status deploy/mysql --timeout=180s
+          kubectl create secret generic capital-events \
+            --from-literal=DATABASE_URL=mysql://cee:cee@mysql:3306/cee \
+            --from-literal=JWT_SECRET=kind-only-secret-at-least-32-characters
+          helm install ce deploy/helm/capital-events -f deploy/kind/values-kind.yaml \
+            --set image.api.repository=ce-api --set image.api.tag=ci \
+            --set image.console.repository=ce-console --set image.console.tag=ci \
+            --wait --timeout 5m
+      - name: seed and call the API through the service
+        run: |
+          set -euo pipefail
+          kubectl exec deploy/ce-api -- /nodejs/bin/node dist/seed/seed-cli.js --institutions=6 --private-clients=20 --late=2 > /dev/null
+          kubectl port-forward svc/ce-api 8080:80 > /dev/null 2>&1 &
+          kubectl port-forward svc/ce-console 8081:80 > /dev/null 2>&1 &
+          sleep 3
+          curl -sf localhost:8080/readyz
+          tid=$(curl -sf localhost:8080/v1/dev/tenants | jq -r '.[0].id')
+          tok=$(curl -sf -XPOST -H 'content-type: application/json' localhost:8080/v1/dev/token \
+            -d "{\"sub\":\"vera@ci\",\"tenantId\":\"$tid\",\"roles\":[\"viewer\"]}" | jq -r .token)
+          funds=$(curl -sf -H "authorization: Bearer $tok" localhost:8080/v1/funds | jq length)
+          verify=$(curl -sf -H "authorization: Bearer $tok" localhost:8080/v1/audit/verify | jq -r .ok)
+          echo "funds=$funds audit=$verify"
+          test "$funds" -ge 2 && test "$verify" = true
+          curl -sfI localhost:8081/ | grep -i "content-security-policy: default-src 'self'"
+      - name: report a failed rollout
+        if: failure()
+        run: |
+          out=$(kubectl get pods -A; kubectl describe deploy/ce-api | tail -n 20; kubectl logs deploy/ce-api --tail=20 2>&1; kubectl logs job -l app.kubernetes.io/component=migrate --tail=20 2>&1 || true)
+          echo "::error title=kind::$(echo "$out" | tail -n 25 | cut -c1-300 | awk 'BEGIN{ORS="%0A"} {print}')"

@@ -1,0 +1,3 @@
+# terraform init -backend-config=backend/production.hcl && terraform apply -var-file=production.tfvars
+environment = "production"
+region      = "eu-central-1"

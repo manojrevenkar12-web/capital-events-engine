@@ -1,5 +1,6 @@
-import { Module } from "@nestjs/common";
+import { Module, RequestMethod } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD } from "@nestjs/core";
+import { LoggerModule } from "nestjs-pino";
 import { AuditService } from "./audit/audit.service.js";
 import { AuthGuard } from "./auth/auth.guard.js";
 import { ProblemFilter } from "./common/errors.js";
@@ -23,7 +24,28 @@ import { PaymentsService } from "./payments/payments.service.js";
 import { SideLettersService } from "./side-letters/side-letters.service.js";
 
 @Module({
-  imports: [DbModule],
+  imports: [
+    DbModule,
+    LoggerModule.forRootAsync({
+      useFactory: () => ({
+        forRoutes: [{ path: "{*path}", method: RequestMethod.ALL }],
+        pinoHttp: {
+          level: process.env.LOG_LEVEL ?? "info",
+          // JSON lines for the log pipeline; tokens and cookies never reach it
+          redact: { paths: ["req.headers.authorization", "req.headers.cookie"], censor: "[redacted]" },
+          // the request id is Fastify's (x-request-id from the ingress, or a new UUID)
+          genReqId: (req) => (req as { id?: string }).id ?? "",
+          autoLogging: {
+            ignore: (req) => /^\/(healthz|readyz|metrics)\b/.test((req as { originalUrl?: string }).originalUrl ?? req.url ?? ""),
+          },
+          serializers: {
+            req: (req: { id: string; method: string; url: string }) => ({ id: req.id, method: req.method, url: req.url }),
+            res: (res: { statusCode: number }) => ({ status: res.statusCode }),
+          },
+        },
+      }),
+    }),
+  ],
   controllers: [
     HealthController,
     DevController,

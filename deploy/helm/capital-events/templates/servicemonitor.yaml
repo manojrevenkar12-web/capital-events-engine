@@ -1,0 +1,12 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "ce.name" . }}-api
+  labels: {{- include "ce.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "ce.selector" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  endpoints: [{ port: http, path: /metrics, interval: 30s }]
+{{- end }}

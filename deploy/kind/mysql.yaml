@@ -1,0 +1,30 @@
+# Throwaway MySQL 8.4 for the kind smoke test only (production uses RDS from deploy/terraform).
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: mysql }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: mysql } }
+  template:
+    metadata: { labels: { app: mysql } }
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.4
+          args: ["--default-time-zone=+00:00"]
+          env:
+            - { name: MYSQL_ROOT_PASSWORD, value: root }
+            - { name: MYSQL_DATABASE, value: cee }
+            - { name: MYSQL_USER, value: cee }
+            - { name: MYSQL_PASSWORD, value: cee }
+          ports: [{ containerPort: 3306 }]
+          readinessProbe:
+            exec: { command: ["mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"] }
+            periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata: { name: mysql }
+spec:
+  selector: { app: mysql }
+  ports: [{ port: 3306 }]
