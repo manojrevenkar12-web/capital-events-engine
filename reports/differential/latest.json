@@ -1,0 +1,62 @@
+{
+  "scenarios": 6000,
+  "identical": 6000,
+  "differences": 0,
+  "byOp": {
+    "allocate": {
+      "total": 546,
+      "same": 546,
+      "errors": 0,
+      "codes": {}
+    },
+    "business_days": {
+      "total": 546,
+      "same": 546,
+      "errors": 0,
+      "codes": {}
+    },
+    "capital_call": {
+      "total": 1092,
+      "same": 1092,
+      "errors": 281,
+      "codes": {
+        "OVER_CALL": 215,
+        "INSUFFICIENT_UNFUNDED": 66
+      }
+    },
+    "equalisation": {
+      "total": 1091,
+      "same": 1091,
+      "errors": 4,
+      "codes": {
+        "UNSUPPORTED_FEE_PERIOD": 4
+      }
+    },
+    "distribution": {
+      "total": 1090,
+      "same": 1090,
+      "errors": 0,
+      "codes": {}
+    },
+    "feeder_call": {
+      "total": 545,
+      "same": 545,
+      "errors": 140,
+      "codes": {
+        "OVER_CALL": 139,
+        "INSUFFICIENT_UNFUNDED": 1
+      }
+    },
+    "mfn": {
+      "total": 1090,
+      "same": 1090,
+      "errors": 0,
+      "codes": {}
+    }
+  },
+  "timingMs": {
+    "engine": 1466,
+    "reference": 1867
+  },
+  "examples": []
+}

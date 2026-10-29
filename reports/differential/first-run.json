@@ -1,0 +1,47 @@
+{
+  "scenarios": 6000,
+  "identical": 6000,
+  "differences": 0,
+  "byOp": {
+    "allocate": {
+      "total": 546,
+      "same": 546,
+      "errors": 0
+    },
+    "business_days": {
+      "total": 546,
+      "same": 546,
+      "errors": 0
+    },
+    "capital_call": {
+      "total": 1092,
+      "same": 1092,
+      "errors": 795
+    },
+    "equalisation": {
+      "total": 1091,
+      "same": 1091,
+      "errors": 5
+    },
+    "distribution": {
+      "total": 1090,
+      "same": 1090,
+      "errors": 0
+    },
+    "feeder_call": {
+      "total": 545,
+      "same": 545,
+      "errors": 412
+    },
+    "mfn": {
+      "total": 1090,
+      "same": 1090,
+      "errors": 0
+    }
+  },
+  "timingMs": {
+    "engine": 1457,
+    "reference": 1774
+  },
+  "examples": []
+}
