@@ -11,7 +11,8 @@ spec:
       containers:
         - name: mysql
           image: mysql:8.4
-          args: ["--default-time-zone=+00:00"]
+          # binary logging is on by default in 8.4; the migration user creates triggers without SUPER
+          args: ["--default-time-zone=+00:00", "--log-bin-trust-function-creators=ON"]
           env:
             - { name: MYSQL_ROOT_PASSWORD, value: root }
             - { name: MYSQL_DATABASE, value: cee }

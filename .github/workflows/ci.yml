@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.13" }
       - run: pip install pytest==8.4.2 ruff==0.14.3
-      - run: scripts/ci-run.sh "ruff" ruff check reference
+      - run: scripts/ci-run.sh "ruff" ruff check reference && ruff check --config reference/ruff.toml scripts
       - run: cd reference && ../scripts/ci-run.sh "reference tests" python -m pytest -q
       - run: pnpm install --frozen-lockfile
       - name: 30,000 generated scenarios, both implementations, results must be identical
@@ -184,5 +184,5 @@ jobs:
       - name: report a failed rollout
         if: failure()
         run: |
-          out=$(kubectl get pods -A; kubectl describe deploy/ce-api | tail -n 20; kubectl logs deploy/ce-api --tail=20 2>&1; kubectl logs job -l app.kubernetes.io/component=migrate --tail=20 2>&1 || true)
+          out=$(kubectl get pods -A; kubectl describe deploy/ce-api | tail -n 20; kubectl logs deploy/ce-api --tail=20 2>&1; kubectl logs -l app.kubernetes.io/component=migrate --tail=20 --all-containers 2>&1 | grep -iE 'error|sqlMessage|code' | head -8 || true)
           echo "::error title=kind::$(echo "$out" | tail -n 25 | cut -c1-300 | awk 'BEGIN{ORS="%0A"} {print}')"

@@ -23,9 +23,11 @@ import { bankEntries, eventsIssued, registry } from "./metrics.js";
 import { toWire } from "./serialize.js";
 
 const STAFF: Role[] = ["preparer", "approver", "viewer"];
+const IMMUTABILITY_TRIGGERS = ["audit_log_no_update", "audit_log_no_delete", "postings_no_update", "postings_no_delete"];
 
 @Controller()
 export class HealthController {
+  private guardsVerified = false;
   constructor(@Inject(SYSTEM_DB) private readonly sys: Db) {}
 
   @Public()
@@ -38,6 +40,17 @@ export class HealthController {
   @Get("readyz")
   async ready() {
     await sql`SELECT 1`.execute(this.sys);
+    // The ledger and audit log are append-only only if these triggers exist. A migration that
+    // could not create them (MySQL 8.4 with binary logging and no log_bin_trust_function_creators)
+    // must not leave a server that looks healthy.
+    if (!this.guardsVerified) {
+      const found = await sql<{ name: string }>`SELECT TRIGGER_NAME AS name FROM information_schema.TRIGGERS
+        WHERE TRIGGER_SCHEMA = DATABASE()`.execute(this.sys);
+      const names = new Set(found.rows.map((r) => r.name));
+      const missing = IMMUTABILITY_TRIGGERS.filter((t) => !names.has(t));
+      if (missing.length) throw new DomainError(503, "NOT_READY", `append-only triggers missing: ${missing.join(", ")}`);
+      this.guardsVerified = true;
+    }
     const lag = await sql<{
       n: string;
       oldest: string | null;

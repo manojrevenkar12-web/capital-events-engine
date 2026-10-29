@@ -104,7 +104,7 @@ export class NoticesService implements OnModuleInit {
       }
       const title =
         ev.kind === "call" ? "Capital call notice" : ev.kind === "distribution" ? "Distribution notice" : "Closing and equalisation notice";
-      const html = `<article class="notice"><header><h1>${title}</h1><p>${escapeHtml(fund.name)} · ${escapeHtml(ev.reference)} · ${ev.issue_date}</p>
+      const html = `<article class="notice"><header><h1>${title}</h1><dl><dt>Fund</dt><dd>${escapeHtml(fund.name)}</dd><dt>Reference</dt><dd>${escapeHtml(ev.reference)}</dd><dt>Date</dt><dd>${ev.issue_date}</dd></dl>
         <p>To ${escapeHtml(l.name)}</p></header>${body}</article>`;
       rows.push({
         id: newId(),

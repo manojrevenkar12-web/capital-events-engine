@@ -13,6 +13,12 @@ resource "aws_db_parameter_group" "mysql" {
     name  = "require_secure_transport"
     value = "1"
   }
+  # binary logging is on (backups, replicas); without this the application user cannot create
+  # the triggers that make postings and the audit log append-only
+  parameter {
+    name  = "log_bin_trust_function_creators"
+    value = "1"
+  }
   parameter {
     name  = "transaction_isolation"
     value = "REPEATABLE-READ"
