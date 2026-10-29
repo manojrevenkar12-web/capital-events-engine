@@ -90,7 +90,7 @@ can place.
 | Engine (Vitest, fast-check) | 23 | arithmetic, dates, allocation, each calculation, properties |
 | Reference (pytest) | 77 | the blind implementation's own tests |
 | Differential | 30,000 per CI run | both implementations on generated scenarios |
-| API (Vitest on MySQL) | 33 | lifecycle, four-eyes, stale approvals, reconciliation, tenancy, immutability, time zones, config, OpenAPI drift |
+| API (Vitest on MySQL) | 34 | lifecycle, four-eyes, stale approvals, reconciliation, tenancy, immutability and readiness, time zones, config, OpenAPI drift |
 | Console (Vitest, Testing Library) | 16 | role-dependent actions, approving the shown hash, error and retry, quote marking, form validation, CSP parity |
 | End to end (Playwright) | 6 | the four-eyes flow across two people, the whole UI under the production CSP, a phone viewport |
 | Held-out side letters | 28 letters | scored once, first run pinned (`reports/heldout/`) |

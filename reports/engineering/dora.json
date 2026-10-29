@@ -1,0 +1,11 @@
+{
+  "note": "no production deploys yet: a green CI run on main stands in for a deploy",
+  "commits_on_main": 7,
+  "ci_runs_completed": 2,
+  "green_runs": 1,
+  "change_failure_rate": 0.5,
+  "lead_time_minutes_median": 11.9,
+  "time_to_restore_minutes": [
+    8.7
+  ]
+}

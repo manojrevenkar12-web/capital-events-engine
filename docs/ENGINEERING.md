@@ -40,6 +40,10 @@ A change is done when:
 a green run on main stands in for a deploy; the numbers describe how fast a change gets to a
 releasable state, not production. Latest output: `reports/engineering/dora.json`.
 
+On this repository so far (7 commits, 2 completed CI runs on main, so a sample too small to mean
+much): median lead time from commit to green 11.9 minutes; one of two runs failed (the console
+preview bound to IPv6 on the runner) and main was green again 8.7 minutes later.
+
 What I would watch in a team, and why:
 
 | Metric | Why it matters for fund operations |
