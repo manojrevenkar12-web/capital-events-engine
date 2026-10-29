@@ -10,3 +10,5 @@ __pycache__/
 .pytest_cache/
 apps/console/test-results/
 apps/console/playwright-report/
+test-results/
+playwright-report/

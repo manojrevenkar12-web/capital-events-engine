@@ -1,0 +1,44 @@
+.toolbar {
+  display: flex;
+  gap: var(--s-4);
+  align-items: end;
+  margin-bottom: var(--s-4);
+  flex-wrap: wrap;
+}
+.field--inline input,
+.field--inline select {
+  min-width: 220px;
+}
+.terms-inline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+.terms-inline li {
+  font-size: var(--t-xs);
+  padding: 1px var(--s-2);
+  border-radius: 999px;
+  background: var(--stamp-wash);
+  color: var(--stamp);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.muted {
+  color: var(--ink-3);
+}
+.ledger-check {
+  margin: 0;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--credit-wash);
+  color: var(--credit);
+  font-weight: 600;
+  font-size: var(--t-sm);
+}
+.ledger-check--bad {
+  background: var(--debit-wash);
+  color: var(--debit);
+}

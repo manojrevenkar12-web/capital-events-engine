@@ -62,7 +62,18 @@ const TokenRequest = z.object({
 
 @Controller("v1/dev")
 export class DevController {
-  constructor(@Inject(CONFIG) private readonly config: AppConfig) {}
+  constructor(
+    @Inject(CONFIG) private readonly config: AppConfig,
+    @Inject(SYSTEM_DB) private readonly sys: Db,
+  ) {}
+
+  /** Tenants to sign in to, for the local identity provider only. */
+  @Public()
+  @Get("tenants")
+  async tenants() {
+    if (!this.config.DEV_TOKENS) throw notFound("route", "/v1/dev/tenants");
+    return this.sys.selectFrom("tenants").select(["id", "name"]).orderBy("created_at").execute();
+  }
 
   /** The local identity provider; off unless DEV_TOKENS=on. Production verifies RS256 from JWKS_URL. */
   @Public()

@@ -1,0 +1,122 @@
+.upload {
+  padding: var(--s-5);
+  display: grid;
+  gap: var(--s-4);
+  margin-bottom: var(--s-5);
+}
+.upload__row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 1fr;
+  gap: var(--s-4);
+}
+.reader {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
+  gap: var(--s-5);
+  align-items: start;
+}
+.letter {
+  padding: var(--s-6) var(--s-6);
+}
+.letter__body {
+  white-space: pre-wrap;
+  font-size: var(--t-lg);
+  line-height: 1.65;
+  max-width: 68ch;
+}
+.letter mark {
+  background: var(--pending-wash);
+  color: inherit;
+  border-radius: 3px;
+  padding: 1px 0;
+  box-shadow: 0 2px 0 var(--pending);
+  transition:
+    background 160ms,
+    box-shadow 160ms;
+}
+.letter mark[data-status="approved"] {
+  background: var(--stamp-wash);
+  box-shadow: 0 2px 0 var(--stamp);
+}
+.letter mark[data-status="rejected"] {
+  background: transparent;
+  box-shadow: 0 2px 0 var(--rule-strong);
+  text-decoration: line-through;
+  text-decoration-color: var(--rule-strong);
+}
+.letter mark[data-active="true"] {
+  box-shadow: 0 0 0 2px var(--stamp);
+}
+.terms {
+  position: sticky;
+  top: var(--s-5);
+  display: grid;
+  gap: var(--s-3);
+}
+.terms > h2 {
+  font-size: var(--t-lg);
+  font-weight: 650;
+}
+.term-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-3);
+}
+.term {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  padding: var(--s-3) var(--s-4);
+  display: grid;
+  gap: var(--s-2);
+}
+.term[data-active="true"] {
+  border-color: var(--stamp);
+}
+.term__pick {
+  all: unset;
+  display: grid;
+  gap: 2px;
+  cursor: pointer;
+}
+.term__pick:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: var(--r-sm);
+}
+.term__type {
+  font-weight: 650;
+}
+.term__meta {
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.term__warn {
+  color: var(--debit);
+}
+.term__actions {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+@media (max-width: 1080px) {
+  .reader {
+    grid-template-columns: 1fr;
+  }
+  .terms {
+    position: static;
+  }
+  .upload__row {
+    grid-template-columns: 1fr;
+  }
+  .letter {
+    padding: var(--s-4);
+  }
+}

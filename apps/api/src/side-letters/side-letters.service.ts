@@ -107,7 +107,7 @@ export class SideLettersService implements OnModuleInit {
       .where("tenant_id", "=", tenantId)
       .where("id", "=", sideLetterId)
       .executeTakeFirst();
-    if (!sl || sl.status !== "extracting") return;
+    if (sl?.status !== "extracting") return;
     const fund = await this.funds.fund(tenantId, sl.fund_id);
     const proposed = await this.extractor.extract(sl.body, { feeRateBps: fund.fee_rate_bps, carryBps: fund.carry_bps });
     const { kept, dropped } = ground(sl.body, proposed);

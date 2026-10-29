@@ -1,0 +1,327 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: 36px;
+  padding: 0 var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--t-md);
+  font-weight: 550;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 160ms,
+    border-color 160ms,
+    transform 120ms;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--ink-2);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn--primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--ink-2);
+  border-color: var(--ink-2);
+}
+.btn--stamp {
+  background: var(--stamp);
+  color: #fff;
+  border-color: var(--stamp);
+}
+.btn--quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.skeleton {
+  display: block;
+  border-radius: var(--r-sm);
+  background: linear-gradient(90deg, var(--rule) 0%, var(--surface-sunk) 50%, var(--rule) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  opacity: 0.55;
+}
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+.state {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+  padding: var(--s-6) var(--s-5);
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface-sunk);
+  max-width: 560px;
+}
+.state h3 {
+  font-size: var(--t-lg);
+  font-weight: 600;
+}
+.state p {
+  margin: 0;
+  color: var(--ink-2);
+}
+.state--error {
+  border-style: solid;
+  border-color: var(--debit);
+  background: var(--debit-wash);
+}
+.state code,
+.halt code {
+  font: inherit;
+  font-weight: 600;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 var(--s-2);
+  border-radius: 999px;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  background: var(--surface-sunk);
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
+  white-space: nowrap;
+}
+.pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pill--credit {
+  color: var(--credit);
+  background: var(--credit-wash);
+  border-color: transparent;
+}
+.pill--debit {
+  color: var(--debit);
+  background: var(--debit-wash);
+  border-color: transparent;
+}
+.pill--pending {
+  color: var(--pending);
+  background: var(--pending-wash);
+  border-color: transparent;
+}
+.pill--stamp {
+  color: var(--stamp);
+  background: var(--stamp-wash);
+  border-color: transparent;
+}
+
+.money {
+  white-space: nowrap;
+}
+.money--in {
+  color: var(--credit);
+}
+.money--out {
+  color: var(--debit);
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-md);
+}
+.table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid var(--rule-strong);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+.table td {
+  padding: 10px var(--s-3);
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.table .n,
+.table th.n {
+  text-align: right;
+}
+.table tbody tr[data-href] {
+  cursor: pointer;
+}
+.table tbody tr[data-href]:hover td {
+  background: var(--surface-sunk);
+}
+.table tfoot td {
+  font-weight: 650;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 0;
+}
+
+.fingerprint {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+  width: 40px;
+  height: 40px;
+}
+.fingerprint span {
+  border-radius: 1.5px;
+  background: var(--rule);
+}
+.fingerprint span[data-on="true"] {
+  background: var(--stamp);
+}
+
+.stamp {
+  display: inline-grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+  border: 2px solid var(--stamp);
+  border-radius: var(--r-md);
+  color: var(--stamp);
+  transform: rotate(-1.5deg);
+}
+.stamp strong {
+  display: block;
+  font-size: var(--t-md);
+}
+.stamp small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.stamp--void {
+  border-color: var(--rule-strong);
+  color: var(--ink-3);
+  transform: none;
+  text-decoration: line-through;
+}
+
+.field {
+  display: grid;
+  gap: var(--s-1);
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  font-weight: 550;
+}
+.field input,
+.field select,
+.field textarea {
+  font: inherit;
+  font-size: var(--t-md);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  padding: 8px var(--s-3);
+}
+.field textarea {
+  min-height: 220px;
+  resize: vertical;
+}
+
+/* shared page parts */
+.segmented {
+  margin-inline: 0;
+  min-inline-size: 0;
+  display: inline-flex;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  margin-bottom: var(--s-4);
+  background: var(--surface-sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+}
+.segmented button {
+  display: inline-flex;
+  gap: var(--s-2);
+  align-items: center;
+  height: 30px;
+  padding: 0 var(--s-3);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 550;
+  cursor: pointer;
+}
+.segmented button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.segmented span {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.strong-link {
+  font-weight: 600;
+  text-decoration: none;
+}
+.strong-link:hover {
+  text-decoration: underline;
+}
+.row-error {
+  color: var(--debit);
+  font-size: var(--t-sm);
+  margin-top: 2px;
+}
+.notice {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--pending-wash);
+  color: var(--ink);
+}
+.notice--bad {
+  background: var(--debit-wash);
+}
+.field-hint {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  font-weight: 400;
+}
+.form-error {
+  color: var(--debit);
+  margin: 0;
+}
+.e2e {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}

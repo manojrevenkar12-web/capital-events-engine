@@ -1,0 +1,122 @@
+/*
+ * Design tokens. A fund operations instrument: cool paper, deep ink, and one signature colour,
+ * the blue of an approval stamp, used only where a person signs something off. Money that
+ * comes in is green, money that goes out is rust, money that is waiting is amber; nothing
+ * else carries colour.
+ */
+:root {
+  --paper: #edf0f3;
+  --surface: #ffffff;
+  --surface-sunk: #f5f7f9;
+  --ink: #121a26;
+  --ink-2: #445063;
+  --ink-3: #6b7686;
+  --rule: #cdd4dd;
+  --rule-strong: #9aa6b5;
+  --stamp: #2743c2;
+  --stamp-wash: #e6eafb;
+  --credit: #0b7a5c;
+  --credit-wash: #e2f3ed;
+  --debit: #a83d27;
+  --debit-wash: #f8e7e2;
+  --pending: #8a5a06;
+  --pending-wash: #f8eedb;
+  --focus: #2743c2;
+  --shadow: 0 1px 0 rgb(18 26 38 / 0.04), 0 8px 24px -12px rgb(18 26 38 / 0.18);
+
+  --font: "Schibsted Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  /* type scale, ratio 1.25 from 14 */
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.875rem;
+  --t-lg: 1rem;
+  --t-xl: 1.25rem;
+  --t-2xl: 1.75rem;
+  --t-3xl: 2.5rem;
+  --lh-tight: 1.15;
+  --lh-body: 1.5;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 14px;
+  --rail: 236px;
+  --measure: 1180px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0d131b;
+    --surface: #141c27;
+    --surface-sunk: #101720;
+    --ink: #e7ecf2;
+    --ink-2: #b2bccb;
+    --ink-3: #8592a5;
+    --rule: #263243;
+    --rule-strong: #3c4a5e;
+    --stamp: #8fa3ff;
+    --stamp-wash: #1d2550;
+    --credit: #4cc7a0;
+    --credit-wash: #12342b;
+    --debit: #f08a6f;
+    --debit-wash: #3a1d16;
+    --pending: #e5b45a;
+    --pending-wash: #382910;
+    --focus: #8fa3ff;
+    --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 12px 28px -14px rgb(0 0 0 / 0.6);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--t-md) / var(--lh-body) var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.015em;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+button {
+  font: inherit;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every component's timing */
+    animation-duration: 0.001ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every component's timing */
+    transition-duration: 0.001ms !important;
+  }
+}

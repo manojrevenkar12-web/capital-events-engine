@@ -225,7 +225,7 @@ export class ClaudeExtractor implements Extractor {
       messages: [{ role: "user", content: `<side_letter>\n${text}\n</side_letter>` }],
     });
     const call = res.content.find((c) => c.type === "tool_use");
-    if (!call || call.type !== "tool_use") return [];
+    if (call?.type !== "tool_use") return [];
     const parsed = ToolInput.safeParse(call.input);
     if (!parsed.success) return [];
     return parsed.data.provisions.map((p) => ({ ...p, start: -1, end: -1 }));

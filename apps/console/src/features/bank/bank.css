@@ -1,0 +1,28 @@
+.import {
+  display: grid;
+  justify-items: end;
+  gap: var(--s-1);
+}
+.import label.btn:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.place {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1.6fr auto;
+  gap: var(--s-3);
+  align-items: end;
+  padding: var(--s-2) 0;
+  overflow: hidden;
+}
+.place-row td {
+  background: var(--surface-sunk);
+}
+@media (max-width: 960px) {
+  .place {
+    grid-template-columns: 1fr;
+  }
+  .import {
+    justify-items: start;
+  }
+}

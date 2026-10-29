@@ -1,0 +1,6 @@
+.audit .hash {
+  font: inherit;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}

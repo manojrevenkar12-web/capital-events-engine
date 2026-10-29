@@ -1,0 +1,150 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+  min-height: 100%;
+}
+.rail {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  padding: var(--s-5) var(--s-4);
+  border-right: 1px solid var(--rule);
+  background: var(--surface-sunk);
+}
+.rail__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-weight: 700;
+  font-size: var(--t-lg);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.rail__fund {
+  display: grid;
+  min-width: 0;
+  gap: var(--s-1);
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+}
+.rail__fund select {
+  width: 100%;
+  min-width: 0;
+  text-overflow: ellipsis;
+  font: inherit;
+  font-size: var(--t-md);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  padding: 7px var(--s-2);
+}
+.rail__nav {
+  display: grid;
+  gap: 2px;
+}
+.rail__nav a {
+  padding: 7px var(--s-3);
+  border-radius: var(--r-md);
+  text-decoration: none;
+  color: var(--ink-2);
+  font-weight: 550;
+}
+.rail__nav a:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+.rail__nav a[aria-current="page"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: inset 3px 0 0 var(--stamp);
+}
+.rail__me {
+  margin-top: auto;
+  display: grid;
+  gap: 2px;
+  font-size: var(--t-sm);
+}
+.rail__me span {
+  color: var(--ink-3);
+}
+.rail__me .btn {
+  justify-self: start;
+  padding: 0;
+  height: 28px;
+}
+.content {
+  padding: var(--s-6) var(--s-6) var(--s-8);
+  max-width: calc(var(--measure) + 2 * var(--s-6));
+  width: 100%;
+}
+.page-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-bottom: var(--s-5);
+  flex-wrap: wrap;
+}
+.page-head h1 {
+  font-size: var(--t-2xl);
+  font-weight: 650;
+}
+.page-head p {
+  margin: var(--s-1) 0 0;
+  color: var(--ink-2);
+  max-width: 70ch;
+}
+.section {
+  margin-top: var(--s-6);
+  display: grid;
+  gap: var(--s-3);
+}
+.section > h2 {
+  font-size: var(--t-lg);
+  font-weight: 650;
+}
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rail {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .rail__fund {
+    flex: 1 1 180px;
+  }
+  .rail__nav {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+    grid-auto-flow: column;
+    justify-content: start;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .rail__nav a[aria-current="page"] {
+    box-shadow: inset 0 -3px 0 var(--stamp);
+  }
+  .rail__me {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: var(--s-3);
+  }
+  .rail__me {
+    margin-top: 0;
+    margin-left: auto;
+  }
+  .content {
+    padding: var(--s-5) var(--s-4) var(--s-7);
+  }
+}

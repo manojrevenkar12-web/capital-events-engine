@@ -22,6 +22,11 @@ export const createDb = (url: string, opts: { guard?: boolean; poolSize?: number
     timezone: "Z",
     multipleStatements: false,
   });
+  // mysql2 reads and writes DATETIMEs as UTC ("Z"); the session must agree, or DEFAULT CURRENT_TIMESTAMP
+  // columns land in the server's zone while values written from Node land in UTC.
+  pool.on("connection", (conn) => {
+    conn.query("SET time_zone = '+00:00'");
+  });
   return new Kysely<Database>({
     dialect: new MysqlDialect({ pool }),
     plugins: opts.guard === false ? [] : [new TenancyGuard()],

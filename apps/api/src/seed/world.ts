@@ -199,6 +199,18 @@ export const buildWorld = async (app: INestApplicationContext, tenantName: strin
   // one extraction is rejected on review, to show the trail
   for (const [i, prov] of proposed.entries()) await letters.decide(bob, prov.id, { decision: i === 3 ? "reject" : "approve" });
 
+  // and one letter arrives later and waits for review in the console
+  const lateLetter = institutions[12];
+  if (lateLetter) {
+    const name = INSTITUTIONS[12 % INSTITUTIONS.length] ?? "Investor";
+    await letters.upload(alice, master.id, {
+      investorId: lateLetter,
+      title: `${name} side letter`,
+      body: (LETTERS[1] ?? LETTERS[0])?.(name) ?? "",
+    });
+    await outbox.drain();
+  }
+
   const run = async (create: () => Promise<{ id: string }>, opts: { issue?: boolean; approve?: boolean } = {}) => {
     const ev = await create();
     const calc = await events.calculate(alice, ev.id).catch((e: unknown) => e);
