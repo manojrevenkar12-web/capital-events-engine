@@ -408,4 +408,55 @@ describe("set-based reconciliation", () => {
     expect(line?.paid).toBe(a.total);
     expect(line?.status).toBe("paid");
   });
+
+  it("books one journal per event and one bank line per credit when a statement pays several events", async () => {
+    const issueCall = async (reference: string) => {
+      const ev = await alice.post(`/v1/funds/${ids.fund}/calls`, {
+        reference,
+        issueDate: "2026-10-06",
+        components: [{ kind: "expense", amount: M(3_000) }],
+      });
+      const calc = await alice.post(`/v1/events/${ev.body.id}/calculate`);
+      await bob.post(`/v1/events/${ev.body.id}/approve`, { resultHash: calc.body.result_hash });
+      await alice.post(`/v1/events/${ev.body.id}/issue`);
+      const lines = (await alice.get(`/v1/events/${ev.body.id}/lines`)).body as Array<{ total: string; end_to_end_id: string }>;
+      return { id: ev.body.id as string, lines: lines.filter((l) => l.total !== "0") };
+    };
+    const x = await issueCall("CALL-2026-10");
+    const y = await issueCall("CALL-2026-11");
+    const credits = [...x.lines, ...y.lines].map((l, i) => ({
+      acctSvcrRef: `MULTI-${i}`,
+      amount: BigInt(l.total),
+      bookingDate: "2026-10-20",
+      endToEndId: l.end_to_end_id,
+      remittance: null,
+      debtorName: "LP",
+      debtorIban: "DE02120300000000202051",
+    }));
+    const r = await alice.post(`/v1/funds/${ids.fund}/bank/camt054`, camt054("BANK-MULTI", "DE89370400440532013000", "EUR", credits));
+    expect(r.body.matched).toBe(credits.length);
+
+    const db = createDb(url, { guard: false });
+    const journals = await db
+      .selectFrom("journal")
+      .select(["id", "event_id"])
+      .where("kind", "=", "payment.received")
+      .where("description", "=", "payments BANK-MULTI")
+      .execute();
+    expect(journals.map((j) => j.event_id).sort()).toEqual([x.id, y.id].sort());
+    const bankLines = await db
+      .selectFrom("postings")
+      .select("amount")
+      .where(
+        "journal_id",
+        "in",
+        journals.map((j) => j.id),
+      )
+      .where("account", "=", "fund.bank")
+      .execute();
+    expect(bankLines.map((b) => BigInt(b.amount)).sort()).toEqual(credits.map((c) => c.amount).sort());
+    await db.destroy();
+    const ledger = await alice.get(`/v1/funds/${ids.fund}/ledger/verify`);
+    expect(ledger.body.ok).toBe(true);
+  });
 });

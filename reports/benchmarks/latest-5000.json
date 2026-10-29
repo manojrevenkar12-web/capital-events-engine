@@ -6,28 +6,28 @@
     "mysql": "8.0.46-0ubuntu0.24.04.4"
   },
   "timingsMs": {
-    "load_investors": 447,
-    "call.calculate": 607,
-    "call.issue": 1370,
-    "call.outbox": 550,
-    "camt054.import": 1353,
-    "closing.calculate": 660,
-    "closing.issue": 2196,
-    "closing.outbox": 1084,
-    "distribution.calculate": 741,
-    "distribution.issue": 990,
-    "distribution.outbox": 935,
-    "ledger.verify": 497
+    "load_investors": 248,
+    "call.calculate": 610,
+    "call.issue": 1167,
+    "call.outbox": 442,
+    "camt054.import": 1268,
+    "closing.calculate": 697,
+    "closing.issue": 2412,
+    "closing.outbox": 906,
+    "distribution.calculate": 522,
+    "distribution.issue": 1166,
+    "distribution.outbox": 963,
+    "ledger.verify": 575
   },
   "callLines": 5000,
   "camt054": {
-    "statementId": "01M63WBXV2GKJ3P3S3CZ0FSGJK",
+    "statementId": "01M63YF478G3FFPJ7KEGRTH637",
     "matched": 5000,
     "unmatched": 0,
     "duplicates": 0,
     "ignored": 0
   },
-  "postings": 69003,
+  "postings": 74002,
   "ledgerOk": true,
-  "at": "2026-10-29T13:07:49.277Z"
+  "at": "2026-10-29T13:44:31.535Z"
 }

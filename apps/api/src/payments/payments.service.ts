@@ -274,12 +274,25 @@ export class PaymentsService implements OnModuleInit {
     ref: string,
   ) {
     await addPayments(trx, tenantId, payments);
-    const total = payments.reduce((sum, x) => sum + x.amount, 0n);
-    const single = payments.length === 1 ? (payments[0]?.eventId ?? null) : null;
-    await this.ledger.post(trx, tenantId, fundId, single, "payment.received", `payments ${ref}`, [
-      { account: ACCOUNTS.bank, amount: total },
-      ...payments.map((x) => ({ account: ACCOUNTS.receivable, investorId: x.investorId, amount: -x.amount })),
-    ]);
+    // One journal per event, and a bank line for every credit: each camt.054 entry keeps its own
+    // ledger line to reconcile against, and every journal still names its event. (Batching once
+    // collapsed the bank side into one line per statement; test/lifecycle.test.ts guards this.)
+    const byEvent = new Map<string, typeof payments>();
+    for (const x of payments) byEvent.set(x.eventId, [...(byEvent.get(x.eventId) ?? []), x]);
+    for (const [eventId, list] of byEvent) {
+      await this.ledger.post(
+        trx,
+        tenantId,
+        fundId,
+        eventId,
+        "payment.received",
+        `payments ${ref}`,
+        list.flatMap((x) => [
+          { account: ACCOUNTS.bank, amount: x.amount },
+          { account: ACCOUNTS.receivable, investorId: x.investorId, amount: -x.amount },
+        ]),
+      );
+    }
     for (const eventId of new Set(payments.map((x) => x.eventId))) {
       const open = await trx
         .selectFrom("event_lines")
