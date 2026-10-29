@@ -14,9 +14,9 @@ jobs:
     name: lint, types, engine and console tests
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: scripts/ci-run.sh "biome" pnpm exec biome ci .
@@ -30,9 +30,9 @@ jobs:
     name: engine against the blind Python reference
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
       - uses: actions/setup-python@v5
         with: { python-version: "3.13" }
@@ -60,9 +60,9 @@ jobs:
         options: >-
           --health-cmd "mysqladmin ping -h 127.0.0.1 -proot" --health-interval 5s --health-timeout 3s --health-retries 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @cee/engine build
@@ -90,9 +90,9 @@ jobs:
       DEV_TOKENS: "on"
       LOG_LEVEL: warn
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: { node-version: "${{ env.NODE_VERSION }}", cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @cee/engine build && pnpm --filter @cee/api build && pnpm --filter @cee/console build
@@ -100,9 +100,12 @@ jobs:
       - name: start the API and the console
         run: |
           (cd apps/api && nohup node dist/main.js > ../../build-api.log 2>&1 &)
-          (cd apps/console && nohup pnpm exec vite preview --port 4173 --strictPort > ../../build-console.log 2>&1 &)
+          (cd apps/console && nohup pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort > ../../build-console.log 2>&1 &)
           for i in $(seq 1 60); do curl -sf 127.0.0.1:3000/readyz && curl -sf 127.0.0.1:4173 > /dev/null && exit 0; sleep 1; done
-          tail -n 30 build-api.log; exit 1
+          for f in build-api.log build-console.log; do
+            echo "::error title=$f::$(tail -n 15 $f | cut -c1-300 | awk 'BEGIN{ORS="%0A"} {print}')"
+          done
+          exit 1
       - run: pnpm --filter @cee/console exec playwright install --with-deps chromium
       - run: scripts/ci-run.sh "e2e" pnpm --filter @cee/console e2e
       - uses: actions/upload-artifact@v4
@@ -113,7 +116,7 @@ jobs:
     name: Helm and Terraform
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: azure/setup-helm@v4
         with: { version: v3.19.0 }
       - name: helm lint and render, validated against Kubernetes 1.33 schemas
@@ -139,7 +142,7 @@ jobs:
     needs: [checks, api]
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
       - name: build images
         run: |
