@@ -18,6 +18,8 @@ import {
   EngineError,
   equalise,
   type Flow,
+  feederCall,
+  type MasterComponent,
   type PriorComponent,
 } from "@cee/engine";
 import { Inject, Injectable } from "@nestjs/common";
@@ -28,6 +30,7 @@ import type { Principal } from "../auth/principal.js";
 import { conflict, forbidden, notFound, unprocessable } from "../common/errors.js";
 import { big, canonicalJson, newId, sha256 } from "../common/util.js";
 import { type AppConfig, CONFIG } from "../config/config.js";
+import { setEndToEndIds } from "../db/bulk.js";
 import type { Db } from "../db/database.js";
 import { DB } from "../db/db.module.js";
 import type { Database, EventKind } from "../db/schema.js";
@@ -209,6 +212,80 @@ export class EventsService {
       .where("l.event_id", "=", eventId);
     if (investorId) q = q.where("l.investor_id", "=", investorId);
     return q.orderBy("l.investor_id").execute();
+  }
+
+  // ---- feeders ---------------------------------------------------------------------------
+
+  /** For each feeder fund invested in a master call: what its LPs owe and whether it can collect in time. */
+  async feederPlan(tenantId: string, masterEventId: string) {
+    const ev = await this.get(tenantId, masterEventId);
+    if (ev.kind !== "call") throw unprocessable("NOT_A_CALL", "feeder plans are for capital calls");
+    if (!ev.result_hash) throw conflict("NOT_CALCULATED", "calculate the master call first");
+    const feeders = await this.db
+      .selectFrom("investors as i")
+      .innerJoin("funds as f", (j) => j.onRef("f.id", "=", "i.feeder_fund_id").onRef("f.tenant_id", "=", "i.tenant_id"))
+      .select(["i.id as investor_id", "f.id as fund_id", "f.name", "f.default_notice_days"])
+      .where("i.tenant_id", "=", tenantId)
+      .where("i.feeder_fund_id", "is not", null)
+      .execute();
+    const lines = await this.lines(tenantId, masterEventId);
+    const comps = ev.input.components as CallComponentInput[];
+    const plans = [];
+    for (const fd of feeders) {
+      const line = lines.find((l) => l.investor_id === fd.investor_id);
+      if (!line) continue;
+      const lps = await this.funds.lps(tenantId, fd.fund_id);
+      const master: MasterComponent[] = comps.map((c, i) =>
+        c.kind === "investment"
+          ? { kind: "investment", amount: big(line.components[i]), sectors: c.sectors }
+          : { kind: c.kind, amount: big(line.components[i]) },
+      );
+      const r = feederCall(
+        master,
+        0n,
+        lps.map((l) => ({
+          id: l.investorId,
+          commitment: l.commitment,
+          contributed: l.contributed,
+          excuseSectors: l.terms.excuseSectors,
+          noticeDays: l.terms.noticeDays,
+        })),
+        ev.issue_date,
+        line.due_date ?? ev.issue_date,
+        fd.default_notice_days,
+        2,
+      );
+      plans.push({
+        feederFundId: fd.fund_id,
+        feederName: fd.name,
+        masterLineTotal: line.total,
+        masterDueDate: line.due_date,
+        latestIssue: r.latestIssue,
+        bridgeRequired: r.bridgeRequired,
+        investors: r.lines.size,
+      });
+    }
+    return plans;
+  }
+
+  /** Create the feeder's own call mirroring its line of the master call (a draft, then the usual workflow). */
+  async createFeederCall(p: Principal, masterEventId: string, feederFundId: string, issueDate: string) {
+    const ev = await this.get(p.tenantId, masterEventId);
+    const feeder = await this.db
+      .selectFrom("investors")
+      .select("id")
+      .where("tenant_id", "=", p.tenantId)
+      .where("feeder_fund_id", "=", feederFundId)
+      .executeTakeFirst();
+    if (!feeder) throw notFound("feeder investor for fund", feederFundId);
+    const line = (await this.lines(p.tenantId, masterEventId, feeder.id))[0];
+    if (!line || !ev.result_hash) throw conflict("NOT_CALCULATED", "calculate the master call first");
+    const comps = (ev.input.components as CallComponentInput[]).map((c, i): CallComponentInput => {
+      const amount = String(big(line.components[i]));
+      if (c.kind === "investment") return { ...c, amount };
+      return { kind: "expense", amount, description: c.kind === "fee" ? "Master fund management fee" : "Master fund expenses" };
+    });
+    return this.createCall(p, feederFundId, { reference: `${ev.reference}-F`.slice(0, 25), issueDate, components: comps });
   }
 
   // ---- calculate -------------------------------------------------------------------------
@@ -638,17 +715,14 @@ export class EventsService {
       if (linesHash(lines) !== ev.result_hash) {
         throw conflict("STALE_CALCULATION", "the fund changed since this event was approved; recalculate and approve again");
       }
-      const width = String(lines.length).length;
+      const width = Math.max(4, String(lines.length).length);
       const sorted = [...lines].sort((a, b) => (a.investorId < b.investorId ? -1 : 1));
-      for (const [n, l] of sorted.entries()) {
-        await trx
-          .updateTable("event_lines")
-          .set({ end_to_end_id: `${ev.reference}-${String(n + 1).padStart(Math.max(4, width), "0")}`.slice(0, 35) })
-          .where("tenant_id", "=", p.tenantId)
-          .where("event_id", "=", eventId)
-          .where("investor_id", "=", l.investorId)
-          .execute();
-      }
+      await setEndToEndIds(
+        trx,
+        p.tenantId,
+        eventId,
+        sorted.map((l, n) => ({ investorId: l.investorId, e2e: `${ev.reference}-${String(n + 1).padStart(width, "0")}`.slice(0, 35) })),
+      );
       await this.book(trx, p.tenantId, fund, ev, lines);
       if (ev.kind === "equalisation") await this.admit(trx, p.tenantId, fund, ev, lines);
       await trx

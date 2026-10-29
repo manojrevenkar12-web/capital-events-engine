@@ -12,7 +12,9 @@
     "migrate": "node dist/db/migrate-cli.js",
     "seed": "node dist/seed/seed-cli.js",
     "openapi": "node dist/openapi-cli.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "heldout": "node dist/eval/heldout-cli.js",
+    "bench": "node dist/seed/bench-cli.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.3.0",

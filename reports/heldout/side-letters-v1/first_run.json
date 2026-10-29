@@ -1,0 +1,395 @@
+{
+  "set": "side-letters-v1",
+  "status": "held-out",
+  "sha256": "6fc359fcdb33d91bbf46b697aeae913b4de77a3ae192834a57d46df191e443aa",
+  "extractor": "rules-v1",
+  "at": "2026-10-29T13:08:02.286Z",
+  "letters": 28,
+  "expected": 66,
+  "proposed": 51,
+  "found": 36,
+  "falsePositives": 15,
+  "categoryRight": 35,
+  "precision": 0.7058823529411765,
+  "recall": 0.5454545454545454,
+  "categoryAccuracy": 0.9722222222222222,
+  "byType": {
+    "FEE_DISCOUNT": {
+      "expected": 9,
+      "found": 1,
+      "falsePositives": 0
+    },
+    "EXCUSE_RIGHT": {
+      "expected": 10,
+      "found": 7,
+      "falsePositives": 5
+    },
+    "REPORTING": {
+      "expected": 10,
+      "found": 2,
+      "falsePositives": 0
+    },
+    "NOTICE_PERIOD": {
+      "expected": 6,
+      "found": 6,
+      "falsePositives": 1
+    },
+    "MFN": {
+      "expected": 6,
+      "found": 0,
+      "falsePositives": 0
+    },
+    "CO_INVEST": {
+      "expected": 7,
+      "found": 7,
+      "falsePositives": 3
+    },
+    "LPAC_SEAT": {
+      "expected": 4,
+      "found": 4,
+      "falsePositives": 6
+    },
+    "DISCLOSURE": {
+      "expected": 4,
+      "found": 2,
+      "falsePositives": 0
+    },
+    "TAX": {
+      "expected": 7,
+      "found": 6,
+      "falsePositives": 0
+    },
+    "CARRY_DISCOUNT": {
+      "expected": 3,
+      "found": 1,
+      "falsePositives": 0
+    }
+  },
+  "misses": [
+    {
+      "letter": "02",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "weapons",
+          "gambling",
+          "adult_entertainment"
+        ]
+      }
+    },
+    {
+      "letter": "02",
+      "type": "REPORTING",
+      "params": {
+        "report": "quarterly esg"
+      }
+    },
+    {
+      "letter": "02",
+      "type": "MFN",
+      "params": {}
+    },
+    {
+      "letter": "03",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 25
+      }
+    },
+    {
+      "letter": "05",
+      "type": "DISCLOSURE",
+      "params": {
+        "topic": "public disclosure laws"
+      }
+    },
+    {
+      "letter": "05",
+      "type": "TAX",
+      "params": {
+        "topic": "tax status"
+      }
+    },
+    {
+      "letter": "06",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 20
+      }
+    },
+    {
+      "letter": "06",
+      "type": "REPORTING",
+      "params": {
+        "report": "annual carbon"
+      }
+    },
+    {
+      "letter": "07",
+      "type": "MFN",
+      "params": {}
+    },
+    {
+      "letter": "08",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 20
+      }
+    },
+    {
+      "letter": "08",
+      "type": "REPORTING",
+      "params": {
+        "report": "annual pai"
+      }
+    },
+    {
+      "letter": "09",
+      "type": "CARRY_DISCOUNT",
+      "params": {
+        "bps": 250
+      }
+    },
+    {
+      "letter": "09",
+      "type": "MFN",
+      "params": {}
+    },
+    {
+      "letter": "11",
+      "type": "REPORTING",
+      "params": {
+        "report": "annual carbon"
+      }
+    },
+    {
+      "letter": "12",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "fossil_fuels"
+        ]
+      }
+    },
+    {
+      "letter": "13",
+      "type": "MFN",
+      "params": {}
+    },
+    {
+      "letter": "15",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "cannabis",
+          "gambling"
+        ]
+      }
+    },
+    {
+      "letter": "16",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 25
+      }
+    },
+    {
+      "letter": "16",
+      "type": "REPORTING",
+      "params": {
+        "report": "annual carbon"
+      }
+    },
+    {
+      "letter": "16",
+      "type": "MFN",
+      "params": {}
+    },
+    {
+      "letter": "16",
+      "type": "DISCLOSURE",
+      "params": {
+        "topic": "public disclosure laws"
+      }
+    },
+    {
+      "letter": "17",
+      "type": "REPORTING",
+      "params": {
+        "report": "quarterly esg"
+      }
+    },
+    {
+      "letter": "19",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 15
+      }
+    },
+    {
+      "letter": "19",
+      "type": "CARRY_DISCOUNT",
+      "params": {
+        "bps": 200
+      }
+    },
+    {
+      "letter": "21",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 25
+      }
+    },
+    {
+      "letter": "22",
+      "type": "REPORTING",
+      "params": {
+        "report": "quarterly esg"
+      }
+    },
+    {
+      "letter": "24",
+      "type": "MFN",
+      "params": {}
+    },
+    {
+      "letter": "25",
+      "type": "REPORTING",
+      "params": {
+        "report": "annual pai"
+      }
+    },
+    {
+      "letter": "26",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 50
+      }
+    },
+    {
+      "letter": "27",
+      "type": "FEE_DISCOUNT",
+      "params": {
+        "bps": 10
+      }
+    }
+  ],
+  "extras": [
+    {
+      "letter": "02",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "adult_entertainment",
+          "gambling"
+        ]
+      }
+    },
+    {
+      "letter": "04",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "fossil_fuels"
+        ]
+      }
+    },
+    {
+      "letter": "04",
+      "type": "LPAC_SEAT",
+      "params": {
+        "seat": true
+      }
+    },
+    {
+      "letter": "04",
+      "type": "CO_INVEST",
+      "params": {
+        "rights": "co-investment offers"
+      }
+    },
+    {
+      "letter": "04",
+      "type": "CO_INVEST",
+      "params": {
+        "rights": "co-investment offers"
+      }
+    },
+    {
+      "letter": "09",
+      "type": "LPAC_SEAT",
+      "params": {
+        "seat": true
+      }
+    },
+    {
+      "letter": "13",
+      "type": "NOTICE_PERIOD",
+      "params": {
+        "days": 7
+      }
+    },
+    {
+      "letter": "16",
+      "type": "LPAC_SEAT",
+      "params": {
+        "seat": true
+      }
+    },
+    {
+      "letter": "18",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "alcohol"
+        ]
+      }
+    },
+    {
+      "letter": "18",
+      "type": "LPAC_SEAT",
+      "params": {
+        "seat": true
+      }
+    },
+    {
+      "letter": "18",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "alcohol"
+        ]
+      }
+    },
+    {
+      "letter": "22",
+      "type": "EXCUSE_RIGHT",
+      "params": {
+        "sectors": [
+          "nuclear"
+        ]
+      }
+    },
+    {
+      "letter": "23",
+      "type": "LPAC_SEAT",
+      "params": {
+        "seat": true
+      }
+    },
+    {
+      "letter": "26",
+      "type": "LPAC_SEAT",
+      "params": {
+        "seat": true
+      }
+    },
+    {
+      "letter": "28",
+      "type": "CO_INVEST",
+      "params": {
+        "rights": "co-investment offers"
+      }
+    }
+  ]
+}

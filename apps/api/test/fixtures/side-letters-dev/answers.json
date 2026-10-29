@@ -1,0 +1,26 @@
+{
+  "01": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 25}, "category": "ECONOMIC"},
+    {"type": "REPORTING", "params": {"report": "annual pai"}, "category": "REPORTING"}
+  ],
+  "02": [
+    {"type": "DISCLOSURE", "params": {"topic": "public disclosure laws"}, "category": "REGULATORY_LP_SPECIFIC"},
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["weapons"]}, "category": "REGULATORY_LP_SPECIFIC"},
+    {"type": "NOTICE_PERIOD", "params": {"days": 20}, "category": "GOVERNANCE"},
+    {"type": "LPAC_SEAT", "params": {"seat": true}, "category": "LPAC_SEAT"}
+  ],
+  "03": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 50}, "category": "FIRST_CLOSE_INCENTIVE"},
+    {"type": "CARRY_DISCOUNT", "params": {"bps": 500}, "category": "ECONOMIC"},
+    {"type": "TAX", "params": {"topic": "withholding"}, "category": "TAX_LP_SPECIFIC"}
+  ],
+  "04": [
+    {"type": "MFN", "params": {}, "category": "GOVERNANCE"},
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST"}
+  ],
+  "05": [
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["adult_entertainment", "alcohol", "gambling"]}, "category": "REGULATORY_LP_SPECIFIC"},
+    {"type": "REPORTING", "params": {"report": "quarterly carbon"}, "category": "REPORTING"}
+  ],
+  "06": []
+}

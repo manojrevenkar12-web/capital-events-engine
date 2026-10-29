@@ -1,0 +1,33 @@
+{
+  "lps": 5000,
+  "lateLps": 500,
+  "machine": {
+    "cpus": 2,
+    "mysql": "8.0.46-0ubuntu0.24.04.4"
+  },
+  "timingsMs": {
+    "load_investors": 399,
+    "call.calculate": 872,
+    "call.issue": 4283,
+    "call.outbox": 485,
+    "camt054.import": 40099,
+    "closing.calculate": 619,
+    "closing.issue": 4830,
+    "closing.outbox": 2663,
+    "distribution.calculate": 571,
+    "distribution.issue": 3393,
+    "distribution.outbox": 3098,
+    "ledger.verify": 391
+  },
+  "callLines": 5000,
+  "camt054": {
+    "statementId": "01M63W4QEA0EF2CY1NB5TYK55M",
+    "matched": 5000,
+    "unmatched": 0,
+    "duplicates": 0,
+    "ignored": 0
+  },
+  "postings": 74002,
+  "ledgerOk": true,
+  "at": "2026-10-29T13:04:40.574Z"
+}

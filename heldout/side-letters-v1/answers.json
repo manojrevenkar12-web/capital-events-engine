@@ -1,0 +1,189 @@
+{
+  "01": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 25}, "category": "ECONOMIC",
+     "quote": "the General Partner agrees that the Management Fee payable by you shall be reduced by 25 basis points per annum."}
+  ],
+  "02": [
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["weapons", "gambling", "adult_entertainment"]}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "Consistent with the ethical investment principles of the Roman Catholic Church that bind the Investor, the Investor shall be excused from participating in any Portfolio Investment in an undertaking which derives more than five per cent (5%) of its turnover from the manufacture of or trade in armaments, the operation of casinos or other gambling businesses, or the production or distribution of pornography."},
+    {"type": "REPORTING", "params": {"report": "quarterly esg"}, "category": "REPORTING",
+     "quote": "The General Partner shall provide the Investor, within sixty (60) days after the end of each calendar quarter, with a report describing the environmental, social and governance performance of each Portfolio Company and any ESG incidents occurring in that quarter."},
+    {"type": "NOTICE_PERIOD", "params": {"days": 15}, "category": "GOVERNANCE",
+     "quote": "Notwithstanding Clause 5.2 of the LPA, the General Partner shall give the Investor not less than fifteen (15) Business Days' prior written notice of each Drawdown."},
+    {"type": "MFN", "params": {}, "category": "GOVERNANCE",
+     "quote": "The Investor shall be entitled to elect to receive the benefit of any provision of any side letter entered into by the General Partner with any other Limited Partner whose Commitment does not exceed the Investor's Commitment, save for any provision that relates to the tax, legal or regulatory status of that other Limited Partner."}
+  ],
+  "03": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 25}, "category": "FIRST_CLOSE_INCENTIVE",
+     "quote": "As the Investor has been admitted to the Partnership at the First Closing, the Management Fee payable by the Investor shall be calculated at the rate of 1.75 per cent. per annum instead of the rate set out in Clause 8.1 of the LPA."},
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST",
+     "quote": "Whenever the General Partner determines, in its reasonable judgement, that a portion of a proposed Portfolio Investment is to be offered to persons other than the Partnership, the General Partner shall offer the Investor the opportunity to co-invest in that portion alongside the Partnership, pro rata to its Commitment and on the same terms as other co-investors."}
+  ],
+  "04": [],
+  "05": [
+    {"type": "DISCLOSURE", "params": {"topic": "public disclosure laws"}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "The General Partner acknowledges that the Investor is a public body subject to the Dutch Open Government Act (Wet open overheid) and agrees that the Investor shall not be in breach of Clause 19 (Confidentiality) of the LPA by reason of any disclosure that the Investor is required to make under that Act or any other public-access legislation applicable to it."},
+    {"type": "TAX", "params": {"topic": "tax status"}, "category": "TAX_LP_SPECIFIC",
+     "quote": "The General Partner shall use reasonable endeavours to ensure that the Partnership is operated in a manner that does not jeopardise the Investor's status as an entity exempt from Dutch corporate income tax."}
+  ],
+  "06": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 20}, "category": "ECONOMIC",
+     "quote": "If the Investor's Commitment exceeds EUR 40,000,000, the Management Fee payable by the Investor shall be reduced from 2.00% to 1.80% per annum."},
+    {"type": "LPAC_SEAT", "params": {"seat": true}, "category": "LPAC_SEAT",
+     "quote": "The Investor shall be entitled to appoint one representative to the Advisory Committee for so long as it remains a Limited Partner and its Commitment has not been reduced below EUR 40,000,000."},
+    {"type": "REPORTING", "params": {"report": "annual carbon"}, "category": "REPORTING",
+     "quote": "Within one hundred and twenty (120) days after the end of each financial year of the Partnership, the General Partner shall provide the Investor with a report on the scope 1 and scope 2 greenhouse gas emissions of the Portfolio Companies, together with the methodology used."}
+  ],
+  "07": [
+    {"type": "LPAC_SEAT", "params": {"seat": true}, "category": "LPAC_SEAT",
+     "quote": "The Investor shall be entitled to a seat on the Advisory Committee, to receive co-investment offers alongside the Partnership on a priority basis, and to elect to receive the benefit of any more favourable rights granted to any other Limited Partner in a side letter, subject only to the exceptions in paragraph 3."},
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST",
+     "quote": "The Investor shall be entitled to a seat on the Advisory Committee, to receive co-investment offers alongside the Partnership on a priority basis, and to elect to receive the benefit of any more favourable rights granted to any other Limited Partner in a side letter, subject only to the exceptions in paragraph 3."},
+    {"type": "MFN", "params": {}, "category": "GOVERNANCE",
+     "quote": "The Investor shall be entitled to a seat on the Advisory Committee, to receive co-investment offers alongside the Partnership on a priority basis, and to elect to receive the benefit of any more favourable rights granted to any other Limited Partner in a side letter, subject only to the exceptions in paragraph 3."},
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["alcohol", "gambling", "tobacco", "adult_entertainment"]}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "In accordance with the Investor's constitutional charter, which requires its investments to comply with the principles of Islamic Shari'a, the Investor shall be excused from participating in any investment in a business that is principally engaged in the production or sale of alcoholic beverages, gambling, tobacco or adult entertainment."},
+    {"type": "TAX", "params": {"topic": "withholding"}, "category": "TAX_LP_SPECIFIC",
+     "quote": "The General Partner shall use commercially reasonable efforts to enable the Investor to claim any exemption from or reduction of withholding tax available to it as a sovereign entity, including by completing and filing such forms as the Investor reasonably requests."}
+  ],
+  "08": [
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["tobacco", "weapons"]}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "As its statutes (Satzung) prohibit it from holding any interest in a business that manufactures tobacco products or weapons, the Foundation shall be excused from participating in any Portfolio Investment in such a business."},
+    {"type": "FEE_DISCOUNT", "params": {"bps": 20}, "category": "ECONOMIC",
+     "quote": "The Management Fee rate applicable to the Foundation shall be one point eight per cent (1.8%) per annum."},
+    {"type": "REPORTING", "params": {"report": "annual pai"}, "category": "REPORTING",
+     "quote": "The General Partner shall deliver to the Foundation, once in each calendar year, a statement of the principal adverse impacts of the Partnership's investments on sustainability factors."}
+  ],
+  "09": [
+    {"type": "CARRY_DISCOUNT", "params": {"bps": 250}, "category": "ECONOMIC",
+     "quote": "Notwithstanding Clause 10.2 of the limited partnership agreement of the Partnership dated 14 February 2026 (the \"LPA\"), the Carried Interest attributable to the Investor's Interest shall be calculated at the rate of 17.5% instead of 20%."},
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST",
+     "quote": "The General Partner shall offer the Investor co-investment opportunities in respect of Portfolio Investments in which co-investment is offered to Limited Partners, and shall give the Investor not less than ten Business Days to respond to each such offer."},
+    {"type": "MFN", "params": {}, "category": "GOVERNANCE",
+     "quote": "The Investor will be entitled to receive copies of all side letters entered into with other Limited Partners and to elect to receive the benefit of any provision of those letters, other than provisions that relate to a Limited Partner's tax, legal or regulatory status."}
+  ],
+  "10": [
+    {"type": "NOTICE_PERIOD", "params": {"days": 20}, "category": "GOVERNANCE",
+     "quote": "In order to allow the Feeder to call capital from its own investors, the General Partner shall give the Feeder not less than twenty (20) Business Days' notice of each Drawdown, notwithstanding the period stated in Clause 5.2 of the LPA."},
+    {"type": "TAX", "params": {"topic": "tax status"}, "category": "TAX_LP_SPECIFIC",
+     "quote": "The General Partner shall not take, and shall procure that the Partnership does not take, any action that would cause the Partnership to cease to be treated as fiscally transparent for Luxembourg tax purposes, so that the Feeder's own tax status is not affected."}
+  ],
+  "11": [
+    {"type": "REPORTING", "params": {"report": "annual carbon"}, "category": "REPORTING",
+     "quote": "The General Partner shall provide the Investor, within ninety (90) days after each 31 December, with a carbon footprint report for the Partnership's portfolio, prepared in accordance with the PCAF standard."}
+  ],
+  "12": [
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["fossil_fuels"]}, "category": "ECONOMIC",
+     "quote": "In line with its responsible investment policy, the Investor may elect not to participate in any Portfolio Investment in a company that derives more than ten per cent (10%) of its revenues from the extraction of thermal coal, oil sands or Arctic oil and gas."}
+  ],
+  "13": [
+    {"type": "DISCLOSURE", "params": {"topic": "public disclosure laws"}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "Notwithstanding Section 14.2 of the Partnership Agreement, the Fund acknowledges that the Limited Partner is subject to the Illinois Freedom of Information Act and agrees that any disclosure of information required by such Act shall not constitute a breach of the Limited Partner's confidentiality obligations under the Partnership Agreement."},
+    {"type": "NOTICE_PERIOD", "params": {"days": 10}, "category": "GOVERNANCE",
+     "quote": "The General Partner shall deliver each capital call notice to the Limited Partner at least ten (10) business days prior to the applicable due date."},
+    {"type": "MFN", "params": {}, "category": "GOVERNANCE",
+     "quote": "The Limited Partner will be entitled to elect the benefit of any provision of a side letter entered into with any other limited partner whose commitment is equal to or less than the Limited Partner's commitment, excluding provisions that relate solely to the tax, legal or regulatory status of such other limited partner."},
+    {"type": "TAX", "params": {"topic": "withholding"}, "category": "TAX_LP_SPECIFIC",
+     "quote": "The Fund will cooperate with the Limited Partner, at the Limited Partner's request, to obtain any available exemption from or refund of withholding taxes imposed on income allocable to the Limited Partner as a governmental plan."}
+  ],
+  "14": [
+    {"type": "LPAC_SEAT", "params": {"seat": true}, "category": "LPAC_SEAT",
+     "quote": "The Investor shall be entitled to appoint one observer to the Advisory Committee, who may attend and speak at its meetings but shall not vote."}
+  ],
+  "15": [
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["cannabis", "gambling"]}, "category": "ECONOMIC",
+     "quote": "The Investor may elect not to participate in any Excluded Investment."},
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST",
+     "quote": "The General Partner will give the Investor the opportunity to participate in co-investment offers made by the General Partner to Limited Partners, on terms no less favourable than those offered to other Limited Partners participating in the same co-investment."}
+  ],
+  "16": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 25}, "category": "ECONOMIC",
+     "quote": "Notwithstanding Clause 8.1 of the LPA, the Management Fee payable in respect of the Investor's Interest shall be reduced by twenty-five basis points (0.25%) per annum for the life of the Partnership."},
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["fossil_fuels"]}, "category": "ECONOMIC",
+     "quote": "The Investor may, in accordance with its responsible investment guidelines adopted by its board, elect to be excused from any Portfolio Investment in a company deriving more than five per cent (5%) of its revenues from thermal coal mining or coal-fired power generation."},
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["weapons"]}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "Under the investment regulations applicable to it as a municipal pension fund, the Investor may not hold interests in undertakings that develop or produce controversial weapons, including cluster munitions and anti-personnel mines, and the Investor shall accordingly be excused from participating in any Portfolio Investment in such an undertaking."},
+    {"type": "REPORTING", "params": {"report": "quarterly esg"}, "category": "REPORTING",
+     "quote": "The General Partner shall provide the Investor with a quarterly ESG report covering each Portfolio Company, in the form of the Invest Europe ESG reporting template or such other form as the parties may agree."},
+    {"type": "REPORTING", "params": {"report": "annual carbon"}, "category": "REPORTING",
+     "quote": "The General Partner shall provide the Investor once a year with an estimate of the financed carbon emissions of the Partnership's portfolio, broken down by Portfolio Company."},
+    {"type": "NOTICE_PERIOD", "params": {"days": 15}, "category": "GOVERNANCE",
+     "quote": "The General Partner shall issue each Drawdown Notice to the Investor not less than fifteen (15) Business Days before the relevant Drawdown Date."},
+    {"type": "MFN", "params": {}, "category": "GOVERNANCE",
+     "quote": "The Investor shall be entitled to elect to receive the benefit of any term granted to any other Limited Partner in a side letter or similar agreement, save for terms granted by reason of the other Limited Partner's tax, legal or regulatory status or its appointment to the Advisory Committee."},
+    {"type": "DISCLOSURE", "params": {"topic": "public disclosure laws"}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "The General Partner acknowledges that information received by the Investor may be subject to disclosure under offentleglova, and agrees that disclosure by the Investor of information that it is legally required to disclose under that Act shall not constitute a breach of Clause 19 of the LPA or of paragraph 10 of this letter."},
+    {"type": "TAX", "params": {"topic": "withholding"}, "category": "TAX_LP_SPECIFIC",
+     "quote": "The General Partner shall, at the Investor's request, provide such certificates and information as are in its possession and are reasonably required for the Investor to reclaim or avoid withholding tax on distributions from Portfolio Investments."}
+  ],
+  "17": [
+    {"type": "REPORTING", "params": {"report": "annual pai"}, "category": "REPORTING",
+     "quote": "The General Partner shall provide the Investor with an annual statement of principal adverse impacts and a quarterly ESG report, each in the form agreed with the Investor before the first Drawdown."},
+    {"type": "REPORTING", "params": {"report": "quarterly esg"}, "category": "REPORTING",
+     "quote": "The General Partner shall provide the Investor with an annual statement of principal adverse impacts and a quarterly ESG report, each in the form agreed with the Investor before the first Drawdown."},
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["nuclear"]}, "category": "ECONOMIC",
+     "quote": "The Investor will be entitled to be excused from any investment in the generation of nuclear power or the mining of uranium, in accordance with its sustainability policy."}
+  ],
+  "18": [
+    {"type": "LPAC_SEAT", "params": {"seat": true}, "category": "LPAC_SEAT",
+     "quote": "The General Partner confirms that, with effect from the date of this letter, the Investor shall be entitled to appoint one observer to the Advisory Committee, on the terms set out in the compendium."}
+  ],
+  "19": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 15}, "category": "FIRST_CLOSE_INCENTIVE",
+     "quote": "In recognition of the Investor's participation in the First Closing, the Management Fee payable by the Investor shall be reduced by fifteen (15) basis points."},
+    {"type": "CARRY_DISCOUNT", "params": {"bps": 200}, "category": "ECONOMIC",
+     "quote": "The Carried Interest applicable to the Investor shall be eighteen per cent (18%) of the relevant profits rather than the twenty per cent (20%) provided for in Clause 10.2 of the LPA."}
+  ],
+  "20": [
+    {"type": "NOTICE_PERIOD", "params": {"days": 15}, "category": "GOVERNANCE",
+     "quote": "The period of notice for each Drawdown Notice delivered to the Investor shall be extended by five (5) Business Days, so that the Investor shall receive not less than fifteen (15) Business Days' notice of each Drawdown."},
+    {"type": "TAX", "params": {"topic": "tax status"}, "category": "TAX_LP_SPECIFIC",
+     "quote": "The General Partner shall use reasonable efforts to ensure that the Partnership does not carry on a trade or business for German trade tax purposes, so that the Investor's participation in the Partnership does not cause it to lose its tax-exempt status."}
+  ],
+  "21": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 25}, "category": "ECONOMIC",
+     "quote": "The Management Fee, which under Clause 8.1 of the Partnership Agreement is two and one half per cent (2.5%) of Commitments per annum, shall in respect of the Investor be two and one quarter per cent (2.25%) of its Commitment per annum."},
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["tobacco", "alcohol"]}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "Because its charter restricts it to activities that promote public health, the Investor shall be excused from participating in any investment in a business that produces tobacco products or alcoholic beverages."},
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST",
+     "quote": "The Investor will be entitled to receive co-investment offers in respect of any investment by the Partnership in the digital health sector in which co-investment is made available to Limited Partners."}
+  ],
+  "22": [
+    {"type": "REPORTING", "params": {"report": "quarterly esg"}, "category": "REPORTING",
+     "quote": "The General Partner shall send the Investor a report on the environmental, social and governance performance of the Portfolio Companies within sixty (60) days after the end of each calendar quarter."}
+  ],
+  "23": [
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST",
+     "quote": "If the Investor's Commitment exceeds EUR 25,000,000, the Investor shall be entitled to receive co-investment offers on a no-fee, no-carry basis in respect of Portfolio Investments in which co-investment is offered to Limited Partners."}
+  ],
+  "24": [
+    {"type": "MFN", "params": {}, "category": "GOVERNANCE",
+     "quote": "The Investor will be entitled to elect to receive the benefit of any rights granted to any other Limited Partner under a side letter, other than rights granted to a Limited Partner by reason of its tax, legal or regulatory status."}
+  ],
+  "25": [
+    {"type": "EXCUSE_RIGHT", "params": {"sectors": ["cannabis"]}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "Because the production and sale of cannabis remain unlawful under the laws and supervisory rules applicable to the Investor, the Investor shall be excused from participating in any investment in a business engaged in the cultivation, production or sale of cannabis, whether for medical or recreational use."},
+    {"type": "TAX", "params": {"topic": "withholding"}, "category": "TAX_LP_SPECIFIC",
+     "quote": "The General Partner shall provide such information and documents as the Investor may reasonably require to claim relief from Spanish or foreign withholding tax on income and gains of the Partnership."},
+    {"type": "REPORTING", "params": {"report": "annual pai"}, "category": "REPORTING",
+     "quote": "The General Partner shall provide the Investor, within four (4) months after the end of each calendar year, with a statement of the principal adverse impact indicators of the Partnership's investments, so as to allow the Investor to meet its own disclosure obligations under the SFDR."}
+  ],
+  "26": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 50}, "category": "ECONOMIC",
+     "quote": "The Investor will be entitled to a Management Fee of 1.5% per annum and a Carried Interest of 15%, in each case in place of the rates provided in the LPA."},
+    {"type": "CARRY_DISCOUNT", "params": {"bps": 500}, "category": "ECONOMIC",
+     "quote": "The Investor will be entitled to a Management Fee of 1.5% per annum and a Carried Interest of 15%, in each case in place of the rates provided in the LPA."},
+    {"type": "CO_INVEST", "params": {"rights": "co-investment offers"}, "category": "CO_INVEST",
+     "quote": "The General Partner will offer the Investor co-investment opportunities in Portfolio Investments in the industrial technology sector where the General Partner seeks co-investment capital from Limited Partners."}
+  ],
+  "27": [
+    {"type": "FEE_DISCOUNT", "params": {"bps": 10}, "category": "FIRST_CLOSE_INCENTIVE",
+     "quote": "Having been admitted at the First Closing, the Investor shall bear the Management Fee at a rate reduced by ten (10) basis points from the rate set out in Clause 8.1 of the LPA."},
+    {"type": "NOTICE_PERIOD", "params": {"days": 12}, "category": "GOVERNANCE",
+     "quote": "The General Partner shall give the Investor at least twelve (12) Business Days' notice of each capital call."}
+  ],
+  "28": [
+    {"type": "DISCLOSURE", "params": {"topic": "public disclosure laws"}, "category": "REGULATORY_LP_SPECIFIC",
+     "quote": "The General Partner agrees that the Investor may disclose information concerning the Partnership where it is required to do so under the Informationsfreiheitsgesetz Nordrhein-Westfalen or any other public records legislation, and that such disclosure shall not breach Clause 19 of the LPA."}
+  ]
+}

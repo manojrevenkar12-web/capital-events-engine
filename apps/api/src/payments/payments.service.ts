@@ -14,6 +14,7 @@ import { AuditService } from "../audit/audit.service.js";
 import type { Principal } from "../auth/principal.js";
 import { conflict, notFound, unprocessable } from "../common/errors.js";
 import { big, newId, sha256 } from "../common/util.js";
+import { addPayments } from "../db/bulk.js";
 import type { Db } from "../db/database.js";
 import { DB } from "../db/db.module.js";
 import type { Database } from "../db/schema.js";
@@ -118,15 +119,12 @@ export class PaymentsService implements OnModuleInit {
         ...owed.map((l) => ({ account: ACCOUNTS.payable, investorId: l.investor_id, amount: l.amount })),
         { account: ACCOUNTS.bank, amount: -controlSum },
       ]);
-      for (const l of owed) {
-        await trx
-          .updateTable("event_lines")
-          .set({ paid: l.amount.toString(), status: "paid" })
-          .where("tenant_id", "=", tenantId)
-          .where("event_id", "=", eventId)
-          .where("investor_id", "=", l.investor_id)
-          .execute();
-      }
+      // a payout line is "paid" when its total (negative for a refund) is matched in full
+      await addPayments(
+        trx,
+        tenantId,
+        owed.map((l) => ({ eventId, investorId: l.investor_id, amount: ev.kind === "distribution" ? l.amount : -l.amount })),
+      );
       await this.audit.append(trx, tenantId, {
         actor: "system:payments",
         action: "payment_file.created",
@@ -179,65 +177,82 @@ export class PaymentsService implements OnModuleInit {
         .execute();
 
       const result = { statementId, matched: 0, unmatched: 0, duplicates: 0, ignored: 0 };
-      for (const e of parsed.entries) {
-        if (!e.credit) {
-          result.ignored += 1;
-          continue;
-        }
-        const dup = await trx
+      const credits = parsed.entries.filter((e) => e.credit);
+      result.ignored = parsed.entries.length - credits.length;
+      // set-based: one query for references already booked, one for the lines the payments name
+      const refs = [...new Set(credits.map((e) => e.acctSvcrRef))];
+      const booked = new Set<string>();
+      for (let i = 0; i < refs.length; i += 1000) {
+        const rows = await trx
           .selectFrom("bank_entries")
-          .select("id")
+          .select("acct_svcr_ref")
           .where("tenant_id", "=", p.tenantId)
-          .where("acct_svcr_ref", "=", e.acctSvcrRef)
+          .where("acct_svcr_ref", "in", refs.slice(i, i + 1000))
           .where("status", "!=", "duplicate")
-          .executeTakeFirst();
-        const ref = e.endToEndId ?? REF.exec(e.remittance ?? "")?.[1] ?? null;
-        const line =
-          !dup && ref
-            ? await trx
-                .selectFrom("event_lines as l")
-                .innerJoin("capital_events as ev", (j) => j.onRef("ev.id", "=", "l.event_id").onRef("ev.tenant_id", "=", "l.tenant_id"))
-                .select(["l.event_id", "l.investor_id", "l.total", "l.paid"])
-                .where("l.tenant_id", "=", p.tenantId)
-                .where("l.end_to_end_id", "=", ref)
-                .where("ev.fund_id", "=", fundId)
-                .where("ev.status", "in", ["issued", "settled"])
-                .executeTakeFirst()
-            : undefined;
-        const status = dup ? "duplicate" : line ? "matched" : "unmatched";
-        await trx
-          .insertInto("bank_entries")
-          .values({
-            id: newId(),
-            tenant_id: p.tenantId,
-            statement_id: statementId,
-            acct_svcr_ref: e.acctSvcrRef,
-            amount: e.amount.toString(),
-            booking_date: e.bookingDate,
-            end_to_end_id: e.endToEndId,
-            remittance: e.remittance,
-            debtor_name: e.debtorName,
-            debtor_iban: e.debtorIban,
-            event_id: line?.event_id ?? null,
-            investor_id: line?.investor_id ?? null,
-            status,
-            note: dup ? "already booked from an earlier notification" : null,
-          })
           .execute();
-        if (dup) {
-          result.duplicates += 1;
-          continue;
-        }
-        if (line) {
-          await this.applyPayment(trx, p.tenantId, fundId, line.event_id, line.investor_id, e.amount, `${e.acctSvcrRef}`);
+        for (const r of rows) booked.add(r.acct_svcr_ref);
+      }
+      const wanted = [
+        ...new Set(credits.map((e) => e.endToEndId ?? REF.exec(e.remittance ?? "")?.[1]).filter((x): x is string => Boolean(x))),
+      ];
+      const lineByRef = new Map<string, { event_id: string; investor_id: string }>();
+      for (let i = 0; i < wanted.length; i += 1000) {
+        const rows = await trx
+          .selectFrom("event_lines as l")
+          .innerJoin("capital_events as ev", (j) => j.onRef("ev.id", "=", "l.event_id").onRef("ev.tenant_id", "=", "l.tenant_id"))
+          .select(["l.event_id", "l.investor_id", "l.end_to_end_id"])
+          .where("l.tenant_id", "=", p.tenantId)
+          .where("l.end_to_end_id", "in", wanted.slice(i, i + 1000))
+          .where("ev.fund_id", "=", fundId)
+          .where("ev.status", "in", ["issued", "settled"])
+          .execute();
+        for (const r of rows) lineByRef.set(r.end_to_end_id, r);
+      }
+      const entryRows = [];
+      const applied: Array<{ eventId: string; investorId: string; amount: bigint }> = [];
+      let unplaced = 0n;
+      for (const e of credits) {
+        const dup = booked.has(e.acctSvcrRef);
+        booked.add(e.acctSvcrRef);
+        const ref = e.endToEndId ?? REF.exec(e.remittance ?? "")?.[1] ?? null;
+        const line = !dup && ref ? lineByRef.get(ref) : undefined;
+        const status = dup ? ("duplicate" as const) : line ? ("matched" as const) : ("unmatched" as const);
+        entryRows.push({
+          id: newId(),
+          tenant_id: p.tenantId,
+          statement_id: statementId,
+          acct_svcr_ref: e.acctSvcrRef,
+          amount: e.amount.toString(),
+          booking_date: e.bookingDate,
+          end_to_end_id: e.endToEndId,
+          remittance: e.remittance,
+          debtor_name: e.debtorName,
+          debtor_iban: e.debtorIban,
+          event_id: line?.event_id ?? null,
+          investor_id: line?.investor_id ?? null,
+          status,
+          note: dup ? "already booked from an earlier notification" : null,
+        });
+        if (dup) result.duplicates += 1;
+        else if (line) {
+          applied.push({ eventId: line.event_id, investorId: line.investor_id, amount: e.amount });
           result.matched += 1;
         } else {
-          await this.ledger.post(trx, p.tenantId, fundId, null, "payment.unplaced", `unplaced credit ${e.acctSvcrRef}`, [
-            { account: ACCOUNTS.bank, amount: e.amount },
-            { account: ACCOUNTS.suspense, amount: -e.amount },
-          ]);
+          unplaced += e.amount;
           result.unmatched += 1;
         }
+      }
+      for (let i = 0; i < entryRows.length; i += 1000)
+        await trx
+          .insertInto("bank_entries")
+          .values(entryRows.slice(i, i + 1000))
+          .execute();
+      if (applied.length) await this.applyPayments(trx, p.tenantId, fundId, applied, parsed.msgId);
+      if (unplaced > 0n) {
+        await this.ledger.post(trx, p.tenantId, fundId, null, "payment.unplaced", `unplaced credits in ${parsed.msgId}`, [
+          { account: ACCOUNTS.bank, amount: unplaced },
+          { account: ACCOUNTS.suspense, amount: -unplaced },
+        ]);
       }
       await this.audit.append(trx, p.tenantId, {
         actor: p.sub,
@@ -250,52 +265,38 @@ export class PaymentsService implements OnModuleInit {
     });
   }
 
-  private async applyPayment(
+  /** Book received payments on their lines in one journal, and settle events that are fully paid. */
+  private async applyPayments(
     trx: Transaction<Database>,
     tenantId: string,
     fundId: string,
-    eventId: string,
-    investorId: string,
-    amount: bigint,
+    payments: Array<{ eventId: string; investorId: string; amount: bigint }>,
     ref: string,
   ) {
-    const line = await trx
-      .selectFrom("event_lines")
-      .select(["total", "paid"])
-      .where("tenant_id", "=", tenantId)
-      .where("event_id", "=", eventId)
-      .where("investor_id", "=", investorId)
-      .forUpdate()
-      .executeTakeFirstOrThrow();
-    const paid = big(line.paid) + amount;
-    const total = big(line.total);
-    const status = paid === total ? "paid" : paid < total ? "partial" : "overpaid";
-    await trx
-      .updateTable("event_lines")
-      .set({ paid: paid.toString(), status })
-      .where("tenant_id", "=", tenantId)
-      .where("event_id", "=", eventId)
-      .where("investor_id", "=", investorId)
-      .execute();
-    await this.ledger.post(trx, tenantId, fundId, eventId, "payment.received", `payment ${ref}`, [
-      { account: ACCOUNTS.bank, amount },
-      { account: ACCOUNTS.receivable, investorId, amount: -amount },
+    await addPayments(trx, tenantId, payments);
+    const total = payments.reduce((sum, x) => sum + x.amount, 0n);
+    const single = payments.length === 1 ? (payments[0]?.eventId ?? null) : null;
+    await this.ledger.post(trx, tenantId, fundId, single, "payment.received", `payments ${ref}`, [
+      { account: ACCOUNTS.bank, amount: total },
+      ...payments.map((x) => ({ account: ACCOUNTS.receivable, investorId: x.investorId, amount: -x.amount })),
     ]);
-    const open = await trx
-      .selectFrom("event_lines")
-      .select("investor_id")
-      .where("tenant_id", "=", tenantId)
-      .where("event_id", "=", eventId)
-      .where("status", "in", ["open", "partial"])
-      .executeTakeFirst();
-    if (!open) {
-      await trx
-        .updateTable("capital_events")
-        .set({ status: "settled" })
+    for (const eventId of new Set(payments.map((x) => x.eventId))) {
+      const open = await trx
+        .selectFrom("event_lines")
+        .select("investor_id")
         .where("tenant_id", "=", tenantId)
-        .where("id", "=", eventId)
-        .where("status", "=", "issued")
-        .execute();
+        .where("event_id", "=", eventId)
+        .where("status", "in", ["open", "partial"])
+        .executeTakeFirst();
+      if (!open) {
+        await trx
+          .updateTable("capital_events")
+          .set({ status: "settled" })
+          .where("tenant_id", "=", tenantId)
+          .where("id", "=", eventId)
+          .where("status", "=", "issued")
+          .execute();
+      }
     }
   }
 
@@ -328,7 +329,13 @@ export class PaymentsService implements OnModuleInit {
         { account: ACCOUNTS.suspense, amount },
         { account: ACCOUNTS.bank, amount: -amount },
       ]);
-      await this.applyPayment(trx, p.tenantId, fundId, input.eventId, input.investorId, amount, e.acct_svcr_ref);
+      await this.applyPayments(
+        trx,
+        p.tenantId,
+        fundId,
+        [{ eventId: input.eventId, investorId: input.investorId, amount }],
+        e.acct_svcr_ref,
+      );
       await trx
         .updateTable("bank_entries")
         .set({ status: "resolved", event_id: input.eventId, investor_id: input.investorId, note: input.note })

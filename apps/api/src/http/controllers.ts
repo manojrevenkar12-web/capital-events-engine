@@ -272,6 +272,19 @@ export class EventsController {
   }
 
   @Roles(...STAFF)
+  @Get("events/:id/feeder-plan")
+  async feederPlan(@CurrentUser() p: Principal, @Param("id") id: string) {
+    return toWire(await this.events.feederPlan(p.tenantId, id));
+  }
+
+  @Roles("preparer")
+  @Post("events/:id/feeder-calls")
+  async feederCall(@CurrentUser() p: Principal, @Param("id") id: string, @Body() body: unknown) {
+    const b = parse(z.object({ feederFundId: z.string(), issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }), body);
+    return toWire(await this.events.createFeederCall(p, id, b.feederFundId, b.issueDate));
+  }
+
+  @Roles(...STAFF)
   @Get("events/:id/payment-file")
   async paymentFile(@CurrentUser() p: Principal, @Param("id") id: string) {
     return toWire(await this.payments.paymentFile(p.tenantId, id));

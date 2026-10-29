@@ -173,7 +173,7 @@ export class RulesExtractor implements Extractor {
       ) {
         add("TAX", { topic: /withholding/i.test(s) ? "withholding" : "tax status" }, "TAX_LP_SPECIFIC");
       }
-      if (/freedom of information|public records|transparency (?:law|act)|Informationsfreiheit/i.test(s)) {
+      if (/freedom of information|public records|transparency (?:law|act)|Informationsfreiheit/i.test(s) && /disclos/i.test(s)) {
         add("DISCLOSURE", { topic: "public disclosure laws" }, "REGULATORY_LP_SPECIFIC");
       }
     }

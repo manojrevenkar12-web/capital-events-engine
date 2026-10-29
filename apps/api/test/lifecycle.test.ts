@@ -371,3 +371,41 @@ describe("a fund from first close to distribution", () => {
     await db.destroy();
   });
 });
+
+describe("set-based reconciliation", () => {
+  it("adds two payments to the same line in one file", async () => {
+    const ev = await alice.post(`/v1/funds/${ids.fund}/calls`, {
+      reference: "CALL-2026-09",
+      issueDate: "2026-10-05",
+      components: [{ kind: "expense", amount: M(6_500) }],
+    });
+    const calc = await alice.post(`/v1/events/${ev.body.id}/calculate`);
+    await bob.post(`/v1/events/${ev.body.id}/approve`, { resultHash: calc.body.result_hash });
+    await alice.post(`/v1/events/${ev.body.id}/issue`);
+    const lines = (await alice.get(`/v1/events/${ev.body.id}/lines`)).body as Array<{
+      investor_id: string;
+      total: string;
+      end_to_end_id: string;
+    }>;
+    const a = lines.find((l) => l.investor_id === ids.A);
+    if (!a) throw new Error("no line");
+    const half = BigInt(a.total) / 2n;
+    const e = (ref: string, amount: bigint) => ({
+      acctSvcrRef: ref,
+      amount,
+      bookingDate: "2026-10-15",
+      endToEndId: a.end_to_end_id,
+      remittance: null,
+      debtorName: "A",
+      debtorIban: "DE02120300000000202051",
+    });
+    await alice.post(
+      `/v1/funds/${ids.fund}/bank/camt054`,
+      camt054("BANK-SPLIT", "DE89370400440532013000", "EUR", [e("S1", half), e("S2", BigInt(a.total) - half)]),
+    );
+    const after = (await alice.get(`/v1/events/${ev.body.id}/lines`)).body as Array<{ investor_id: string; paid: string; status: string }>;
+    const line = after.find((l) => l.investor_id === ids.A);
+    expect(line?.paid).toBe(a.total);
+    expect(line?.status).toBe("paid");
+  });
+});
